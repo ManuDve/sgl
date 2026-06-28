@@ -10,6 +10,7 @@ import cl.sgl.dto.UpdateServicePriceRequest;
 import cl.sgl.entity.LegalService;
 import cl.sgl.entity.ServicePriceHistory;
 import cl.sgl.exception.ResourceNotFoundException;
+import cl.sgl.repository.AppointmentRepository;
 import cl.sgl.repository.LegalServiceRepository;
 import cl.sgl.repository.ServicePriceHistoryRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ import static cl.sgl.service.AuditService.*;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -37,6 +39,7 @@ public class LegalServiceService {
 
     private final LegalServiceRepository serviceRepository;
     private final ServicePriceHistoryRepository priceHistoryRepository;
+    private final AppointmentRepository appointmentRepository;
     private final AuditService auditService;
 
     /**
@@ -63,9 +66,9 @@ public class LegalServiceService {
             .active(request.getActive() != null ? request.getActive() : true)
             .build();
 
-        // Guardar en base de datos
         LegalService savedService = serviceRepository.save(service);
         log.info("Servicio creado exitosamente con ID: {}", savedService.getId());
+        auditService.log(ACCION_CREAR, ENTIDAD_SERVICIO, savedService.getId().toString(), savedService.getName());
 
         return mapToResponse(savedService);
     }
@@ -177,17 +180,22 @@ public class LegalServiceService {
 
         LegalService updatedService = serviceRepository.save(service);
         log.info("Servicio actualizado exitosamente, ID: {}", id);
+        auditService.log(ACCION_ACTUALIZAR, ENTIDAD_SERVICIO, id.toString(), updatedService.getName());
 
         return mapToResponse(updatedService);
     }
 
     /**
      * Elimina un servicio por ID.
+     * Si el servicio tiene agendamientos asociados, realiza soft-delete (activo=false)
+     * y retorna el servicio desactivado. Si no tiene agendamientos, elimina físicamente
+     * y retorna Optional.empty().
      *
      * @param id ID del servicio a eliminar
+     * @return Optional con el servicio desactivado (soft-delete) o vacío (hard-delete)
      * @throws ResourceNotFoundException si el servicio no existe
      */
-    public void deleteService(Long id) {
+    public Optional<LegalServiceResponse> deleteService(Long id) {
         log.info("Eliminando servicio con ID: {}", id);
 
         LegalService service = serviceRepository.findById(id)
@@ -196,8 +204,19 @@ public class LegalServiceService {
                 return new ResourceNotFoundException("Servicio con ID " + id + " no encontrado");
             });
 
+        if (appointmentRepository.existsByServiceId(id)) {
+            service.setActive(false);
+            LegalService deactivated = serviceRepository.save(service);
+            log.info("Servicio ID={} desactivado (tiene agendamientos asociados)", id);
+            auditService.log(ACCION_DESACTIVAR, ENTIDAD_SERVICIO, id.toString(),
+                "Desactivado por tener agendamientos asociados: " + service.getName());
+            return Optional.of(mapToResponse(deactivated));
+        }
+
         serviceRepository.deleteById(id);
-        log.info("Servicio eliminado exitosamente, ID: {}", id);
+        log.info("Servicio eliminado físicamente, ID: {}", id);
+        auditService.log(ACCION_ELIMINAR, ENTIDAD_SERVICIO, id.toString(), service.getName());
+        return Optional.empty();
     }
 
     /**

@@ -71,4 +71,6 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long>,
     List<Appointment> findByEstadoAndFechaAndHora(@Param("estado") AppointmentStatus estado,
                                                    @Param("fecha") LocalDate fecha,
                                                    @Param("hora") LocalTime hora);
+
+    boolean existsByServiceId(Long serviceId);
 }

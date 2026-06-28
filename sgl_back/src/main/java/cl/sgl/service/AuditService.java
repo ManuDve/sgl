@@ -37,6 +37,10 @@ public class AuditService {
     public static final String ACCION_CAMBIO_ESTADO  = "CAMBIO_ESTADO";
     public static final String ACCION_CONFIRMAR_PAGO = "CONFIRMAR_PAGO";
     public static final String ACCION_CAMBIO_PRECIO  = "CAMBIO_PRECIO";
+    public static final String ACCION_CREAR          = "CREAR";
+    public static final String ACCION_ACTUALIZAR     = "ACTUALIZAR";
+    public static final String ACCION_ELIMINAR       = "ELIMINAR";
+    public static final String ACCION_DESACTIVAR     = "DESACTIVAR";
 
     public static final String ENTIDAD_AUTH          = "AUTH";
     public static final String ENTIDAD_AGENDAMIENTO  = "AGENDAMIENTO";

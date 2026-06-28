@@ -193,7 +193,8 @@
                 "services",
                 "{{serviceId}}"
               ]
-            }
+            },
+            "description": "Elimina un servicio. Si el servicio tiene agendamientos asociados realiza soft-delete (active=false) y retorna el servicio desactivado en 'data'. Si no tiene agendamientos, elimina físicamente y retorna data=null.\n\nRespuesta exitosa (200):\n- data=null → eliminado físicamente\n- data={...active:false} → desactivado por tener citas asociadas"
           },
           "response": []
         },

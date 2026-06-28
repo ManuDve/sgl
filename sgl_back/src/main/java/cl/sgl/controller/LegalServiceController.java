@@ -22,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Controlador REST para gestión de servicios legales.
@@ -220,38 +221,52 @@ public class LegalServiceController {
      * @param id ID del servicio a eliminar
      * @return Respuesta de confirmación
      */
+    /**
+     * Elimina un servicio.
+     * Si tiene agendamientos asociados, realiza soft-delete (activo=false) y lo indica en el mensaje.
+     * Si no tiene agendamientos, elimina físicamente (data=null en la respuesta).
+     */
     @DeleteMapping("/api/admin/services/{id}")
-    @Operation(summary = "Eliminar servicio", description = "Elimina un servicio existente. Requiere autenticación de administrador.")
+    @Operation(
+        summary = "Eliminar servicio",
+        description = "Elimina un servicio. Si tiene agendamientos asociados, lo desactiva (soft-delete) " +
+            "en lugar de eliminarlo físicamente. Requiere autenticación de administrador."
+    )
     @ApiResponses(value = {
         @io.swagger.v3.oas.annotations.responses.ApiResponse(
             responseCode = "200",
-            description = "Servicio eliminado exitosamente"
+            description = "Eliminado (data=null) o desactivado (data=servicio con active=false)"
         ),
         @io.swagger.v3.oas.annotations.responses.ApiResponse(
             responseCode = "404",
             description = "Servicio no encontrado"
         )
     })
-    public ResponseEntity<ApiResponse<Void>> deleteService(
+    public ResponseEntity<ApiResponse<LegalServiceResponse>> deleteService(
         @PathVariable Long id) {
         log.info("DELETE /api/admin/services/{} - Eliminar servicio", id);
 
         try {
-            legalServiceService.deleteService(id);
-            ApiResponse<Void> response = new ApiResponse<>(
+            Optional<LegalServiceResponse> result = legalServiceService.deleteService(id);
+            if (result.isPresent()) {
+                return ResponseEntity.ok(new ApiResponse<>(
+                    HttpStatus.OK.value(),
+                    "El servicio tiene citas asociadas y fue desactivado en lugar de eliminado.",
+                    result.get()
+                ));
+            }
+            return ResponseEntity.ok(new ApiResponse<>(
                 HttpStatus.OK.value(),
                 "Servicio eliminado exitosamente",
                 null
-            );
-            return ResponseEntity.ok(response);
+            ));
         } catch (Exception e) {
             log.error("Error al eliminar servicio: {}", e.getMessage());
-            ApiResponse<Void> errorResponse = new ApiResponse<>(
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>(
                 HttpStatus.NOT_FOUND.value(),
                 e.getMessage(),
-                e.getMessage()
-            );
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+                null
+            ));
         }
     }
 

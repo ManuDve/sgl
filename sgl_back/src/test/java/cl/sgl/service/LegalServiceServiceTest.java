@@ -6,6 +6,7 @@ import cl.sgl.dto.ServicePublicDTO;
 import cl.sgl.dto.UpdateLegalServiceRequest;
 import cl.sgl.entity.LegalService;
 import cl.sgl.exception.ResourceNotFoundException;
+import cl.sgl.repository.AppointmentRepository;
 import cl.sgl.repository.LegalServiceRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -40,6 +41,9 @@ class LegalServiceServiceTest {
 
     @Mock
     private cl.sgl.repository.ServicePriceHistoryRepository priceHistoryRepository;
+
+    @Mock
+    private AppointmentRepository appointmentRepository;
 
     @Mock
     private AuditService auditService;
@@ -249,32 +253,51 @@ class LegalServiceServiceTest {
     }
 
     @Test
-    @DisplayName("Eliminar servicio exitosamente")
-    void testDeleteService_Success() {
-        // Arrange
+    @DisplayName("Eliminar servicio sin agendamientos — eliminación física")
+    void testDeleteService_SinAgendamientos_EliminacionFisica() {
         when(serviceRepository.findById(1L)).thenReturn(Optional.of(testService));
+        when(appointmentRepository.existsByServiceId(1L)).thenReturn(false);
 
-        // Act
-        legalServiceService.deleteService(1L);
+        Optional<LegalServiceResponse> result = legalServiceService.deleteService(1L);
 
-        // Assert
-        verify(serviceRepository, times(1)).findById(1L);
+        assertTrue(result.isEmpty());
         verify(serviceRepository, times(1)).deleteById(1L);
+        verify(serviceRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Eliminar servicio con agendamientos — soft-delete (desactivar)")
+    void testDeleteService_ConAgendamientos_SoftDelete() {
+        when(serviceRepository.findById(1L)).thenReturn(Optional.of(testService));
+        when(appointmentRepository.existsByServiceId(1L)).thenReturn(true);
+        when(serviceRepository.save(any(LegalService.class))).thenAnswer(inv -> {
+            LegalService s = inv.getArgument(0);
+            return LegalService.builder()
+                .id(s.getId()).name(s.getName()).description(s.getDescription())
+                .price(s.getPrice()).active(false)
+                .createdAt(s.getCreatedAt()).updatedAt(LocalDateTime.now())
+                .build();
+        });
+
+        Optional<LegalServiceResponse> result = legalServiceService.deleteService(1L);
+
+        assertTrue(result.isPresent());
+        assertFalse(result.get().getActive());
+        verify(serviceRepository, never()).deleteById(any());
+        verify(serviceRepository, times(1)).save(any(LegalService.class));
     }
 
     @Test
     @DisplayName("Eliminar servicio falla cuando no existe")
     void testDeleteService_NotFound() {
-        // Arrange
         when(serviceRepository.findById(999L)).thenReturn(Optional.empty());
 
-        // Act & Assert
-        assertThrows(ResourceNotFoundException.class, () -> {
-            legalServiceService.deleteService(999L);
-        });
+        assertThrows(ResourceNotFoundException.class, () ->
+            legalServiceService.deleteService(999L));
 
         verify(serviceRepository, times(1)).findById(999L);
         verify(serviceRepository, never()).deleteById(any());
+        verify(appointmentRepository, never()).existsByServiceId(any());
     }
 
     @Test

@@ -1,5 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
+import CreateServiceModal from "./CreateServiceModal";
+import EditServiceModal from "./EditServiceModal";
 import EditPriceModal from "./EditPriceModal";
+import DeleteServiceModal from "./DeleteServiceModal";
 
 // ── Tipos ──────────────────────────────────────────────────────
 
@@ -37,7 +40,11 @@ function SkeletonRow() {
         <div className="h-5 w-16 bg-sgl-gray-mid/15 rounded-full" />
       </td>
       <td className="px-4 py-4">
-        <div className="h-7 w-24 bg-sgl-gray-mid/15 rounded" />
+        <div className="flex gap-2">
+          <div className="h-7 w-24 bg-sgl-gray-mid/15 rounded" />
+          <div className="h-7 w-16 bg-sgl-gray-mid/15 rounded" />
+          <div className="h-7 w-20 bg-sgl-gray-mid/10 rounded" />
+        </div>
       </td>
     </tr>
   );
@@ -46,10 +53,14 @@ function SkeletonRow() {
 // ── Componente principal ──────────────────────────────────────
 
 export default function ServiciosAdmin() {
-  const [services,       setServices]       = useState<Service[]>([]);
-  const [loading,        setLoading]        = useState(true);
-  const [error,          setError]          = useState("");
-  const [selectedService, setSelectedService] = useState<Service | null>(null);
+  const [services,        setServices]        = useState<Service[]>([]);
+  const [loading,         setLoading]         = useState(true);
+  const [error,           setError]           = useState("");
+
+  const [showCreate,      setShowCreate]      = useState(false);
+  const [priceService,    setPriceService]    = useState<Service | null>(null);
+  const [editService,     setEditService]     = useState<Service | null>(null);
+  const [deleteService,   setDeleteService]   = useState<Service | null>(null);
 
   const fetchServices = useCallback(() => {
     const token = localStorage.getItem("sgl_token");
@@ -77,19 +88,41 @@ export default function ServiciosAdmin() {
 
   useEffect(() => { fetchServices(); }, [fetchServices]);
 
-  function handlePriceUpdated() {
-    setSelectedService(null);
+  function closeAndRefresh() {
+    setShowCreate(false);
+    setPriceService(null);
+    setEditService(null);
+    setDeleteService(null);
     fetchServices();
   }
 
+  const COLS = ["Servicio", "Precio", "Estado", "Acciones"];
+
   return (
     <>
-      {/* Modal de edición de precio */}
-      {selectedService && (
+      {/* Modales */}
+      {showCreate && (
+        <CreateServiceModal onSuccess={closeAndRefresh} onClose={() => setShowCreate(false)} />
+      )}
+      {priceService && (
         <EditPriceModal
-          service={selectedService}
-          onSuccess={handlePriceUpdated}
-          onClose={() => setSelectedService(null)}
+          service={priceService}
+          onSuccess={closeAndRefresh}
+          onClose={() => setPriceService(null)}
+        />
+      )}
+      {editService && (
+        <EditServiceModal
+          service={editService}
+          onSuccess={closeAndRefresh}
+          onClose={() => setEditService(null)}
+        />
+      )}
+      {deleteService && (
+        <DeleteServiceModal
+          service={deleteService}
+          onSuccess={closeAndRefresh}
+          onClose={() => setDeleteService(null)}
         />
       )}
 
@@ -101,9 +134,25 @@ export default function ServiciosAdmin() {
         >
           Servicios
         </h2>
-        <span className="font-sans text-sm text-sgl-gray-mid">
-          {!loading && !error && `${services.length} servicio${services.length !== 1 ? "s" : ""}`}
-        </span>
+        <div className="flex items-center gap-4">
+          {!loading && !error && (
+            <span className="font-sans text-sm text-sgl-gray-mid">
+              {services.length} servicio{services.length !== 1 ? "s" : ""}
+            </span>
+          )}
+          <button
+            type="button"
+            onClick={() => setShowCreate(true)}
+            className="bg-sgl-gold hover:bg-sgl-gold-light text-sgl-black font-semibold rounded
+              transition-colors duration-200 inline-flex items-center gap-2"
+            style={{ padding: "8px 18px" }}
+          >
+            <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+            </svg>
+            Nuevo servicio
+          </button>
+        </div>
       </div>
 
       {/* Tabla */}
@@ -112,7 +161,7 @@ export default function ServiciosAdmin() {
           <table className="w-full font-sans text-sm">
             <thead>
               <tr className="bg-sgl-gray border-b border-sgl-gold/10">
-                {["Servicio", "Precio", "Estado", "Acción"].map((col) => (
+                {COLS.map((col) => (
                   <th key={col} className="px-4 py-3 text-left text-xs font-semibold text-sgl-gold uppercase tracking-wider whitespace-nowrap">
                     {col}
                   </th>
@@ -130,7 +179,13 @@ export default function ServiciosAdmin() {
         </div>
       ) : services.length === 0 ? (
         <div className="bg-sgl-gray border border-sgl-gold/10 rounded-lg px-6 py-12 text-center text-sgl-gray-mid font-sans text-sm">
-          No hay servicios registrados.
+          No hay servicios registrados.{" "}
+          <button
+            onClick={() => setShowCreate(true)}
+            className="text-sgl-gold hover:underline"
+          >
+            Crear el primero
+          </button>
         </div>
       ) : (
         <div
@@ -140,7 +195,7 @@ export default function ServiciosAdmin() {
           <table className="w-full font-sans text-sm">
             <thead>
               <tr className="bg-sgl-gray border-b border-sgl-gold/10">
-                {["Servicio", "Precio", "Estado", "Acción"].map((col) => (
+                {COLS.map((col) => (
                   <th key={col} className="px-4 py-3 text-left text-xs font-semibold text-sgl-gold uppercase tracking-wider whitespace-nowrap">
                     {col}
                   </th>
@@ -161,9 +216,7 @@ export default function ServiciosAdmin() {
                 >
                   {/* Nombre + descripción */}
                   <td className="px-4 py-4">
-                    <div className="font-sans text-sm font-medium text-sgl-white">
-                      {svc.name}
-                    </div>
+                    <div className="font-sans text-sm font-medium text-sgl-white">{svc.name}</div>
                     {svc.description && (
                       <div className="font-sans text-xs text-sgl-gray-mid mt-0.5 max-w-xs truncate">
                         {svc.description}
@@ -191,17 +244,45 @@ export default function ServiciosAdmin() {
                     </span>
                   </td>
 
-                  {/* Acción */}
+                  {/* Acciones */}
                   <td className="px-4 py-4 whitespace-nowrap">
-                    <button
-                      type="button"
-                      onClick={() => setSelectedService(svc)}
-                      className="border border-sgl-gold/40 text-sgl-gold text-xs font-semibold rounded
-                        hover:border-sgl-gold hover:bg-sgl-gold/10 transition-colors duration-200"
-                      style={{ padding: "6px 14px" }}
-                    >
-                      Editar precio
-                    </button>
+                    <div className="flex items-center gap-2">
+                      {/* Editar precio */}
+                      <button
+                        type="button"
+                        onClick={() => setPriceService(svc)}
+                        className="border border-sgl-gold/40 text-sgl-gold text-xs font-semibold rounded
+                          hover:border-sgl-gold hover:bg-sgl-gold/10 transition-colors duration-200"
+                        style={{ padding: "5px 12px" }}
+                        title="Actualizar precio"
+                      >
+                        Precio
+                      </button>
+
+                      {/* Editar datos */}
+                      <button
+                        type="button"
+                        onClick={() => setEditService(svc)}
+                        className="border border-sgl-gray-mid/40 text-sgl-gray-mid text-xs font-semibold rounded
+                          hover:border-sgl-white/50 hover:text-sgl-white transition-colors duration-200"
+                        style={{ padding: "5px 12px" }}
+                        title="Editar nombre y descripción"
+                      >
+                        Editar
+                      </button>
+
+                      {/* Eliminar */}
+                      <button
+                        type="button"
+                        onClick={() => setDeleteService(svc)}
+                        className="border border-red-500/30 text-red-400 text-xs font-semibold rounded
+                          hover:border-red-500/60 hover:bg-red-500/10 transition-colors duration-200"
+                        style={{ padding: "5px 12px" }}
+                        title="Eliminar servicio"
+                      >
+                        Eliminar
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}

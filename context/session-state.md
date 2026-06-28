@@ -6,7 +6,7 @@
 ## Estado actual
 - **Release activo:** R2
 - **Fase:** Desarrollo
-- **Última historia completada:** SGL-055 ADM-AUDIT — registro y vista de auditoría de acciones admin
+- **Última historia completada:** SGL-052 ADM-SERV-CRUD — CRUD completo de servicios con soft-delete y modales en panel admin
 - **En desarrollo:** SGL-084 NFR-TZ, SGL-096 NFR-COMPAT
 - **Próxima historia:** SGL-084 NFR-TZ
 
@@ -113,6 +113,7 @@
 | SGL-075 | WA-CONSULT | WhatsAppConversationState.java (nuevo enum), WhatsAppBotService.java (nuevo, estado en memoria TTL 10min, flujo "1"→ID→detalles/error), WhatsAppService (+sendBotReply), WhatsAppWebhookController (delega a WhatsAppBotService), WhatsAppBotServiceTest (nuevo, +11 casos), WhatsAppServiceTest (+3 casos), WhatsAppWebhookControllerTest (+actualizado) | 18/06/2026 |
 | SGL-076 | WA-LINK | WhatsAppConversationState (+WAITING_FOR_REAGENDAR_ID, +WAITING_FOR_CANCELAR_ID), WhatsAppBotService (flujo "2"/"3"→ID→link /gestionar?id=, +frontendUrl, +MSG_REAGENDAR_LINK/CANCELAR_LINK/NOT_FOUND_MANAGEMENT), application.yml (+whatsapp.bot.frontend-url), WhatsAppBotServiceTest (+6 casos) | 18/06/2026 |
 | SGL-055 | ADM-AUDIT | V013__Create_audit_log_table.sql, AuditLog.java, AuditLogRepository.java, AuditLogDTO.java, AuditPageResponse.java, AuditService.java, AuditLogController.java, AuthService/AppointmentService/LegalServiceService (+auditService wire-up), AuditServiceTest (+7 casos), AuditoriaAdmin.tsx, auditoria.astro, AdminLayout.astro (+nav link) | 19/06/2026 |
+| SGL-052 | ADM-SERV-CRUD (completo) | LegalServiceService#deleteService (soft-delete con existsByServiceId), AppointmentRepository (+existsByServiceId), LegalServiceController (DELETE retorna Optional), AuditService (+ACCION_CREAR/ACTUALIZAR/ELIMINAR/DESACTIVAR), LegalServiceServiceTest (+3 casos delete), CreateServiceModal.tsx, EditServiceModal.tsx, DeleteServiceModal.tsx, ServiciosAdmin.tsx (botón Nuevo + acciones Precio/Editar/Eliminar), postman | 28/06/2026 |
 
 ## Historias R2 en desarrollo
 | ID | Alias | Estado |
