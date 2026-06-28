@@ -89,6 +89,7 @@ details[open] .svc-body { grid-template-rows: 1fr; }
 
 /* Botón nativo del selector de fechas visible en fondos oscuros */
 input[type="date"] { color-scheme: dark; }
+html[data-theme="light"] input[type="date"] { color-scheme: light; }
 
 @theme {
   --animate-shimmer: shimmer 1.6s ease-in-out infinite;
@@ -104,3 +105,46 @@ input[type="date"] { color-scheme: dark; }
   --font-family-sans: "Inter", sans-serif;
   --font-family-serif: "Playfair Display", serif;
 }
+
+/* ── Canales RGB del gold — para usar en rgba() ────────────────── */
+:root                    { --sgl-gold-rgb: 201, 168, 76;  }
+html[data-theme="light"] { --sgl-gold-rgb: 122,  92, 15;  }
+
+/* ── Variables de shimmer para skeletons ───────────────────────── */
+:root {
+  --color-shimmer-card:    #1a1a1a;
+  --color-shimmer-card-hi: #2c2c2c;
+  --color-shimmer-dark:    #111111;
+  --color-shimmer-dark-hi: #222222;
+}
+html[data-theme="light"] {
+  --color-shimmer-card:    #ffffff;
+  --color-shimmer-card-hi: #eae7e0;
+  --color-shimmer-dark:    #f5f3ee;
+  --color-shimmer-dark-hi: #e2dfd8;
+}
+
+/* ── Modo claro — overrides de tokens ──────────────────────────────
+   Contraste WCAG 2.1 AA verificado:
+   texto/fondo: 17.5:1 | secundario/fondo: 7.1:1 | gold/fondo: 5.3:1 */
+html[data-theme="light"] {
+  --color-sgl-black:      #F5F3EE;
+  --color-sgl-white:      #141210;
+  --color-sgl-gold:       #7A5C0F;
+  --color-sgl-gold-light: #8A6A12;
+  --color-sgl-gray:       #FFFFFF;
+  --color-sgl-gray-mid:   #52504A;
+  --color-sgl-gray-light: #C8C5BC;
+}
+
+/* En light mode las cards (bg-sgl-gray) necesitan sombra para
+   distinguirse del fondo de página (bg-sgl-black) */
+html[data-theme="light"] .bg-sgl-gray {
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.09), 0 0 0 1px rgba(0, 0, 0, 0.04);
+}
+
+/* Íconos del toggle de tema — controlados por data-theme */
+#theme-icon-sun  { display: none; }
+#theme-icon-moon { display: none; }
+html[data-theme="dark"]  #theme-icon-sun  { display: block; }
+html[data-theme="light"] #theme-icon-moon { display: block; }

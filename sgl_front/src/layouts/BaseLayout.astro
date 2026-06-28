@@ -8,14 +8,22 @@ const {
   ogTitle = title,
   ogDescription = description,
   showNav = true,
+  forceDark = false,
 } = Astro.props;
 ---
 
 <!doctype html>
-<html lang="es" class="scroll-smooth">
+<html lang="es" class="scroll-smooth" data-theme="dark">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
+    <!-- Script sin-flash: corre sincrónicamente antes de que el CSS se aplique -->
+    <script is:inline define:vars={{ forceDark }}>
+      if (!forceDark) {
+        var t = localStorage.getItem("sgl-theme");
+        if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);
+      }
+    </script>
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@600;700&display=swap"

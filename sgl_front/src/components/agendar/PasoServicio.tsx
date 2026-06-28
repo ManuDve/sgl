@@ -41,43 +41,31 @@ const ICONOS = [
   </svg>,
 ];
 
+const SHIMMER_CARD = {
+  background: "linear-gradient(90deg, var(--color-shimmer-card) 25%, var(--color-shimmer-card-hi) 50%, var(--color-shimmer-card) 75%)",
+  backgroundSize: "200% 100%",
+  animation: "shimmer 1.6s ease-in-out infinite",
+} as const;
+
+const SHIMMER_DARK = {
+  background: "linear-gradient(90deg, var(--color-shimmer-dark) 25%, var(--color-shimmer-dark-hi) 50%, var(--color-shimmer-dark) 75%)",
+  backgroundSize: "200% 100%",
+  animation: "shimmer 1.6s ease-in-out infinite",
+} as const;
+
 /* Skeleton de una card */
 function SkeletonCard() {
   return (
     <div className="rounded-xl border border-sgl-gray-light/10 bg-sgl-gray overflow-hidden">
-      <div className="h-1 w-full" style={{
-        background: "linear-gradient(90deg, #1A1A1A 25%, #2a2a2a 50%, #1A1A1A 75%)",
-        backgroundSize: "200% 100%",
-        animation: "shimmer 1.6s ease-in-out infinite",
-      }} />
+      <div className="h-1 w-full" style={SHIMMER_CARD} />
       <div className="p-6 flex flex-col gap-4">
-        <div className="w-10 h-10 rounded-lg bg-sgl-black/60" style={{
-          background: "linear-gradient(90deg, #111 25%, #222 50%, #111 75%)",
-          backgroundSize: "200% 100%",
-          animation: "shimmer 1.6s ease-in-out infinite",
-        }} />
+        <div className="w-10 h-10 rounded-lg" style={SHIMMER_DARK} />
         <div className="space-y-2">
-          <div className="h-5 w-3/4 rounded" style={{
-            background: "linear-gradient(90deg, #222 25%, #2d2d2d 50%, #222 75%)",
-            backgroundSize: "200% 100%",
-            animation: "shimmer 1.6s ease-in-out infinite",
-          }} />
-          <div className="h-4 w-full rounded" style={{
-            background: "linear-gradient(90deg, #1a1a1a 25%, #252525 50%, #1a1a1a 75%)",
-            backgroundSize: "200% 100%",
-            animation: "shimmer 1.6s ease-in-out infinite",
-          }} />
-          <div className="h-4 w-2/3 rounded" style={{
-            background: "linear-gradient(90deg, #1a1a1a 25%, #252525 50%, #1a1a1a 75%)",
-            backgroundSize: "200% 100%",
-            animation: "shimmer 1.6s ease-in-out infinite",
-          }} />
+          <div className="h-5 w-3/4 rounded" style={SHIMMER_DARK} />
+          <div className="h-4 w-full rounded"  style={SHIMMER_CARD} />
+          <div className="h-4 w-2/3 rounded"  style={SHIMMER_CARD} />
         </div>
-        <div className="h-5 w-1/3 rounded mt-auto" style={{
-          background: "linear-gradient(90deg, #222 25%, #2d2d2d 50%, #222 75%)",
-          backgroundSize: "200% 100%",
-          animation: "shimmer 1.6s ease-in-out infinite",
-        }} />
+        <div className="h-5 w-1/3 rounded mt-auto" style={SHIMMER_DARK} />
       </div>
     </div>
   );

@@ -27,7 +27,7 @@ function linkClass(href: string) {
       <a href="/#contacto"  class={linkClass("/#contacto")}>Contacto</a>
     </nav>
 
-    <!-- CTA desktop + hamburguesa móvil -->
+    <!-- CTA desktop + toggle de tema + hamburguesa móvil -->
     <div class="flex items-center gap-3">
       <a
         href="/agendar"
@@ -35,6 +35,23 @@ function linkClass(href: string) {
       >
         Agendar
       </a>
+
+      <!-- Toggle tema claro/oscuro -->
+      <button
+        id="theme-toggle"
+        aria-label="Cambiar tema"
+        class="w-9 h-9 flex items-center justify-center text-sgl-gray-mid hover:text-sgl-white transition-colors duration-200 shrink-0"
+      >
+        <!-- Sol: aparece en modo oscuro (clic → pasar a claro) -->
+        <svg id="theme-icon-sun" viewBox="0 0 20 20" fill="none" class="w-5 h-5" aria-hidden="true">
+          <circle cx="10" cy="10" r="3.5" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M10 2v1.5M10 16.5V18M2 10h1.5M16.5 10H18M4.22 4.22l1.06 1.06M14.72 14.72l1.06 1.06M4.22 15.78l1.06-1.06M14.72 5.28l1.06-1.06" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <!-- Luna: aparece en modo claro (clic → pasar a oscuro) -->
+        <svg id="theme-icon-moon" viewBox="0 0 20 20" fill="none" class="w-5 h-5" aria-hidden="true">
+          <path d="M17.5 11.5A7.5 7.5 0 0 1 8.5 2.5a7.5 7.5 0 1 0 9 9z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
 
       <!-- Hamburguesa (solo móvil) -->
       <button
@@ -91,6 +108,7 @@ function linkClass(href: string) {
 </aside>
 
 <script>
+  // ── Drawer de navegación ────────────────────────────────────────
   const hamburger = document.getElementById("nav-hamburger");
   const drawer    = document.getElementById("nav-drawer");
   const backdrop  = document.getElementById("nav-backdrop");
@@ -115,9 +133,19 @@ function linkClass(href: string) {
     closeBtn.addEventListener("click", closeDrawer);
     backdrop.addEventListener("click", closeDrawer);
 
-    // Cerrar con Escape
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") closeDrawer();
+    });
+  }
+
+  // ── Toggle tema claro/oscuro ────────────────────────────────────
+  const themeToggle = document.getElementById("theme-toggle");
+  if (themeToggle) {
+    themeToggle.addEventListener("click", () => {
+      const html = document.documentElement;
+      const next = html.getAttribute("data-theme") === "dark" ? "light" : "dark";
+      html.setAttribute("data-theme", next);
+      localStorage.setItem("sgl-theme", next);
     });
   }
 </script>
