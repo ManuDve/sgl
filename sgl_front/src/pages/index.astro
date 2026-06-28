@@ -22,13 +22,6 @@ try {
   fetchError = true;
 }
 
-function formatCLP(n: number): string {
-  return new Intl.NumberFormat("es-CL", {
-    style: "currency",
-    currency: "CLP",
-    maximumFractionDigits: 0,
-  }).format(n);
-}
 ---
 
 <BaseLayout
@@ -185,7 +178,6 @@ function formatCLP(n: number): string {
               <summary class="flex items-center justify-between gap-3 px-6 py-5 cursor-pointer select-none">
                 <div class="flex-1 min-w-0">
                   <h3 class="font-serif text-lg font-semibold text-sgl-white leading-snug">{svc.nombre}</h3>
-                  <p class="font-sans text-sm text-sgl-gold mt-1">{formatCLP(svc.precio)}</p>
                 </div>
                 <svg
                   class="svc-chevron shrink-0 w-5 h-5 text-sgl-gray-mid"

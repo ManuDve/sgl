@@ -7,14 +7,6 @@ interface Servicio {
   precio: number;
 }
 
-function formatPrecio(precio: number): string {
-  return new Intl.NumberFormat("es-CL", {
-    style: "currency",
-    currency: "CLP",
-    maximumFractionDigits: 0,
-  }).format(precio);
-}
-
 /* Íconos legales — se asignan por índice de forma circular */
 const ICONOS = [
   // Balanza
@@ -208,17 +200,6 @@ export default function PasoServicio({ onContinuar }: Props) {
                       </p>
                     )}
 
-                    {/* Precio */}
-                    <p className={`
-                      font-sans text-sm font-semibold mt-auto pt-2 border-t
-                      transition-colors duration-200
-                      ${activo
-                        ? "text-sgl-gold border-sgl-gold/20"
-                        : "text-sgl-gray-mid border-sgl-gray-light/10 group-hover:text-sgl-gold/80"
-                      }
-                    `}>
-                      Desde {formatPrecio(s.precio)}
-                    </p>
                   </div>
                 </button>
               );
