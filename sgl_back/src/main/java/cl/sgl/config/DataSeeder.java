@@ -7,8 +7,8 @@ import cl.sgl.repository.AppointmentRepository;
 import cl.sgl.repository.LegalServiceRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,16 +18,17 @@ import java.time.LocalTime;
 import java.util.List;
 
 /**
- * Inserta datos de prueba al iniciar en perfil dev.
- * Solo ejecuta si la tabla appointments está vacía.
- *
- * Activar con: --spring.profiles.active=dev
+ * Inserta datos de demostración al iniciar.
+ * Solo ejecuta si SGL_SEED_DEMO=true está definida en el entorno.
+ * Por defecto NO siembra nada.
  */
 @Component
-@Profile("dev")
 @RequiredArgsConstructor
 @Slf4j
 public class DataSeeder implements CommandLineRunner {
+
+    @Value("${SGL_SEED_DEMO:false}")
+    private boolean seedDemo;
 
     private final AppointmentRepository appointmentRepository;
     private final LegalServiceRepository legalServiceRepository;
@@ -35,6 +36,11 @@ public class DataSeeder implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) {
+        if (!seedDemo) {
+            log.info("[DataSeeder] SGL_SEED_DEMO no activa — seed omitido");
+            return;
+        }
+
         if (appointmentRepository.count() > 0) {
             log.info("[DataSeeder] Tabla appointments no está vacía — seed omitido");
             return;

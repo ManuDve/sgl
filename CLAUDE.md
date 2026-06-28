@@ -267,7 +267,9 @@ function goTo(nuevoPaso: Paso, dir: "forward" | "back") {
 | `JWT_EXPIRATION_HOURS` | `8` | |
 | `MAILTRAP_API_TOKEN` | — | Opcional; sin token no se envían emails |
 | `ALLOWED_ORIGIN` | `http://localhost:4321` | CORS — un solo origen |
-| `SPRING_PROFILES_ACTIVE` | `dev` | `dev` activa DataSeeder |
+| `SPRING_PROFILES_ACTIVE` | `dev` | `dev` activa DataSeeder si también se define `SGL_SEED_DEMO=true` |
+| `SGL_SEED_DEMO` | `true` | Si está ausente o `false`, DataSeeder no siembra nada (seguro en producción) |
+| `ADMIN_PASSWORD` | — | Contraseña del admin inicial. En `dev` sin esta variable usa `admin123`; en producción es obligatoria |
 | `TRANSBANK_COMMERCE_CODE` | código de integración | |
 | `TRANSBANK_API_KEY` | clave de integración | |
 | `TRANSBANK_ENV` | `integration` | `integration` o `production` |
@@ -323,8 +325,8 @@ Ejemplo de fila para agregar en la tabla:
 
 | Componente | Descripción | Activación |
 |------------|-------------|-----------|
-| `cl.sgl.config.DataSeeder` | Inserta 4 servicios y 10 agendamientos de prueba (estados mixtos, fechas próximas 30 días, nombres chilenos) | `SPRING_PROFILES_ACTIVE=dev` |
-| `cl.sgl.config.AdminUserInitializer` | Crea admin por defecto `admin@sgl.cl / admin123` | Todos los perfiles excepto `test` |
+| `cl.sgl.config.DataSeeder` | Inserta 4 servicios y 10 agendamientos de prueba (estados mixtos, fechas próximas 30 días, nombres chilenos) | `SGL_SEED_DEMO=true` (cualquier perfil; por defecto NO siembra) |
+| `cl.sgl.config.AdminUserInitializer` | Crea admin `admin@sgl.cl`. Contraseña desde `ADMIN_PASSWORD`; si no está definida usa `admin123` solo en perfil `dev` (ERROR en prod) | Todos los perfiles excepto `test` |
 
 ---
 

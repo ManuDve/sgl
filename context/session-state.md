@@ -140,7 +140,8 @@
 | `optimizeDeps.esbuildOptions.define` en astro.config.mjs | esbuild pre-bundleaba react/jsx-dev-runtime con NODE_ENV=production |
 | KPIs calculados client-side (SGL-044 parcial) | Reutiliza endpoint existente sin endpoint dedicado |
 | SGL-088 OPS-SONAR descartada | No se usa SonarQube en el proyecto; calidad de código cubierta por JaCoCo (cobertura mínima 60%) y revisión manual |
-| DataSeeder con `@Profile("dev")` | Datos de prueba aislados del perfil producción |
+| DataSeeder controlado por `SGL_SEED_DEMO=true` | Gate por env var en lugar de perfil; permite sembrar en staging sin cambiar perfil y garantiza que prod no siembre por defecto |
+| `ADMIN_PASSWORD` desde env var | Contraseña del admin no hardcodeada en producción; fallback `admin123` solo en perfil `dev` con log INFO; log ERROR si falta en prod |
 | AG-CAPTCHA movida a Bloqueo/R3 | Sin Google reCAPTCHA keys disponibles |
 
 ---
@@ -199,8 +200,8 @@ Para pantallas nuevas (no multipaso): usar `[data-animate]` + `IntersectionObser
 ## Componentes de infraestructura
 | Componente | Descripción | Activación |
 |------------|-------------|-----------|
-| `cl.sgl.config.DataSeeder` | 4 servicios + 10 agendamientos de prueba | `SPRING_PROFILES_ACTIVE=dev` |
-| `cl.sgl.config.AdminUserInitializer` | Admin `admin@sgl.cl / admin123` | Todos excepto perfil `test` |
+| `cl.sgl.config.DataSeeder` | 4 servicios + 10 agendamientos de prueba | `SGL_SEED_DEMO=true` (cualquier perfil; por defecto no siembra) |
+| `cl.sgl.config.AdminUserInitializer` | Admin `admin@sgl.cl`. Contraseña desde `ADMIN_PASSWORD`; fallback `admin123` solo en perfil `dev` | Todos excepto perfil `test` |
 
 ---
 
