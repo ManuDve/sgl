@@ -1039,6 +1039,43 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "Captcha",
+      "item": [
+        {
+          "name": "POST Verify Turnstile Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"<token-del-widget-turnstile>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/captcha/verify",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "captcha",
+                "verify"
+              ]
+            },
+            "description": "Verifica el token generado por el widget Cloudflare Turnstile. Retorna success=true si es humano. Sin JWT."
+          }
+        }
+      ]
     }
   ],
   "variable": [

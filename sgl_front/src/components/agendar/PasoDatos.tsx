@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 interface Servicio {
   id: number;
@@ -20,12 +20,24 @@ interface Props {
   onAtras: () => void;
 }
 
+// ─── Turnstile (window global) ────────────────────────────────
+
+declare global {
+  interface Window {
+    turnstile?: {
+      render:      (el: HTMLElement, opts: Record<string, unknown>) => string;
+      reset:       (id: string) => void;
+      remove:      (id: string) => void;
+      getResponse: (id: string) => string | undefined;
+    };
+  }
+}
+
 // ─── Validadores ─────────────────────────────────────────────
 
 const VALIDATORS = {
   nombre: (v: string): string => {
     if (!v.trim()) return "El nombre es obligatorio.";
-    // Mínimo 2 palabras, solo letras (con tildes) y espacios
     if (!/^[a-záéíóúüñA-ZÁÉÍÓÚÜÑ]+([ ][a-záéíóúüñA-ZÁÉÍÓÚÜÑ]+)+$/.test(v.trim()))
       return "Ingresa nombre y apellido (solo letras, sin números).";
     return "";
@@ -38,17 +50,15 @@ const VALIDATORS = {
   },
   telefono: (v: string): string => {
     if (!v.trim()) return "El teléfono es obligatorio.";
-    // Acepta: +56912345678 | +56 9 1234 5678 | +56 912345678
     if (!/^\+56\s?[0-9]\s?\d{4}\s?\d{4}$/.test(v.trim()))
       return "Usa el formato chileno: +56 9 1234 5678.";
     return "";
   },
 } as const;
 
-type Campo = keyof typeof VALIDATORS;
-
-type Errores  = Record<Campo, string>;
-type Touched  = Record<Campo, boolean>;
+type Campo   = keyof typeof VALIDATORS;
+type Errores = Record<Campo, string>;
+type Touched = Record<Campo, boolean>;
 
 // ─── Componente de campo ──────────────────────────────────────
 
@@ -163,15 +173,60 @@ export default function PasoDatos({ servicio, inicial, onContinuar, onAtras }: P
   const [aceptaTC,   setAceptaTC]   = useState(false);
   const [aceptaPriv, setAceptaPriv] = useState(false);
 
-  const allValues = { nombre, email, telefono };
+  // ── Turnstile ────────────────────────────────────────────────
+  const turnstileRef  = useRef<HTMLDivElement>(null);
+  const widgetId      = useRef<string | undefined>(undefined);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaError, setCaptchaError] = useState("");
+  const [verifying,    setVerifying]    = useState(false);
 
-  // Validar al perder foco
+  const siteKey       = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY as string | undefined;
+  const captchaActive = Boolean(siteKey);
+
+  useEffect(() => {
+    if (!captchaActive || !turnstileRef.current) return;
+
+    const render = () => {
+      if (!window.turnstile || !turnstileRef.current || widgetId.current) return;
+      const theme = document.documentElement.getAttribute("data-theme") ?? "dark";
+      widgetId.current = window.turnstile.render(turnstileRef.current, {
+        sitekey: siteKey as string,
+        theme:   theme === "light" ? "light" : "dark",
+        callback: (token: string) => {
+          setCaptchaToken(token);
+          setCaptchaError("");
+        },
+        "expired-callback": () => setCaptchaToken(null),
+        "error-callback":   () => {
+          setCaptchaToken(null);
+          setCaptchaError("Error al cargar el captcha. Recarga la página.");
+        },
+      });
+    };
+
+    if (window.turnstile) {
+      render();
+    } else {
+      const interval = setInterval(() => {
+        if (window.turnstile) { clearInterval(interval); render(); }
+      }, 150);
+      return () => clearInterval(interval);
+    }
+  }, [captchaActive, siteKey]);
+
+  // ── Validación ───────────────────────────────────────────────
+
+  const allValues    = { nombre, email, telefono };
+  const currentErrors = validate(nombre, email, telefono);
+  const formOk  = Object.values(currentErrors).every(e => e === "") && aceptaTC && aceptaPriv;
+  // El captcha no bloquea el botón — se valida al hacer click con getResponse() como fuente primaria
+  const isValid = formOk;
+
   function handleBlur(campo: Campo) {
     setTouched(t => ({ ...t, [campo]: true }));
     setErrors(e => ({ ...e, [campo]: VALIDATORS[campo](allValues[campo]) }));
   }
 
-  // Re-validar en tiempo real si el campo ya fue tocado
   function handleChange(campo: Campo, value: string, setter: (v: string) => void) {
     setter(value);
     if (touched[campo]) {
@@ -179,15 +234,47 @@ export default function PasoDatos({ servicio, inicial, onContinuar, onAtras }: P
     }
   }
 
-  // Verificar si todos los campos son válidos (sin necesidad de haber sido tocados)
-  const currentErrors = validate(nombre, email, telefono);
-  const isValid = Object.values(currentErrors).every(e => e === "") && aceptaTC && aceptaPriv;
+  // ── Continuar (async: verifica captcha antes de avanzar) ─────
 
-  function handleContinuar() {
-    // Mostrar todos los errores aunque el usuario no haya tocado los campos
+  async function handleContinuar() {
     setTouched({ nombre: true, email: true, telefono: true });
     setErrors(currentErrors);
-    if (!isValid) return;
+    if (!formOk) return;
+
+    if (captchaActive) {
+      // getResponse() como fuente primaria: funciona aunque el callback no haya disparado
+      const token =
+        (widgetId.current ? window.turnstile?.getResponse(widgetId.current) : undefined)
+        ?? captchaToken
+        ?? undefined;
+
+      if (!token) {
+        setCaptchaError("Completa la verificación de seguridad para continuar.");
+        return;
+      }
+      setVerifying(true);
+      setCaptchaError("");
+      try {
+        const res  = await fetch("http://localhost:8080/api/captcha/verify", {
+          method:  "POST",
+          headers: { "Content-Type": "application/json" },
+          body:    JSON.stringify({ token }),
+        });
+        const body = await res.json();
+        if (!body.data) {
+          setCaptchaError("Verificación fallida. Resuelve el captcha nuevamente.");
+          setCaptchaToken(null);
+          if (widgetId.current && window.turnstile) window.turnstile.reset(widgetId.current);
+          return;
+        }
+      } catch {
+        setCaptchaError("No se pudo verificar la seguridad. Intenta nuevamente.");
+        return;
+      } finally {
+        setVerifying(false);
+      }
+    }
+
     onContinuar({
       nombre:      nombre.trim(),
       email:       email.trim(),
@@ -313,11 +400,25 @@ export default function PasoDatos({ servicio, inicial, onContinuar, onAtras }: P
         )}
       </div>
 
+      {/* SGL-027 — Turnstile anti-bot */}
+      {captchaActive && (
+        <div className="flex flex-col gap-3 border-t border-sgl-gold/10 pt-6">
+          <p className="font-sans text-xs text-sgl-gold uppercase tracking-widest">
+            Verificación de seguridad
+          </p>
+          <div ref={turnstileRef} />
+          {captchaError && (
+            <p className="font-sans text-xs text-red-400">{captchaError}</p>
+          )}
+        </div>
+      )}
+
       {/* Botones */}
       <div className="flex items-center justify-between gap-4">
         <button
           type="button"
           onClick={onAtras}
+          disabled={verifying}
           style={{ padding: "12px 32px" }}
           className="border border-sgl-gold/40 text-sgl-gold hover:border-sgl-gold hover:bg-sgl-gold/10 font-semibold rounded transition-colors duration-200"
         >
@@ -326,14 +427,15 @@ export default function PasoDatos({ servicio, inicial, onContinuar, onAtras }: P
         <button
           type="button"
           onClick={handleContinuar}
+          disabled={verifying}
           style={{
             padding: "12px 40px",
-            opacity: isValid ? 1 : 0.4,
-            cursor:  isValid ? "pointer" : "not-allowed",
+            opacity: isValid && !verifying ? 1 : 0.4,
+            cursor:  isValid && !verifying ? "pointer" : "not-allowed",
           }}
           className="bg-sgl-gold hover:bg-sgl-gold-light text-sgl-black font-semibold rounded transition-colors duration-200"
         >
-          Continuar
+          {verifying ? "Verificando…" : "Continuar"}
         </button>
       </div>
 

@@ -194,7 +194,7 @@ class EmailTemplateBuilderTest {
     void testBuildCancellationEmail_IncluyeContactoYFooter() {
         String html = builder.buildCancellationEmail(appointment);
 
-        assertTrue(html.contains("contacto@sglabogados.cl"), "debe incluir el email de contacto");
+        assertTrue(html.contains("contacto@alexcontreras.cl"), "debe incluir el email de contacto");
         assertTrue(html.contains("class=\"ftr\""),            "debe incluir el footer");
     }
 

@@ -46,6 +46,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/public/**").permitAll()
                 .requestMatchers("/api/webpay/**").permitAll()
                 .requestMatchers("/api/whatsapp/**").permitAll()
+                .requestMatchers("/api/captcha/**").permitAll()
                 .requestMatchers("/api/admin/**").authenticated()
                 .anyRequest().permitAll()
             )

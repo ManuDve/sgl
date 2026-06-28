@@ -103,8 +103,8 @@ public class EmailTemplateBuilder {
             "<p class=\"note\">Si necesitas cancelar o reagendar tu cita, " +
             "contáctanos con al menos 24 horas de anticipación.</p>" +
             "<p class=\"note\">¿Tienes dudas? Escríbenos a " +
-            "<a href=\"mailto:contacto@sglabogados.cl\" style=\"color:#C9A84C;\">" +
-            "contacto@sglabogados.cl</a></p>";
+            "<a href=\"mailto:contacto@alexcontreras.cl\" style=\"color:#C9A84C;\">" +
+            "contacto@alexcontreras.cl</a></p>";
 
         return wrap(
             "Estudio Jurídico · Santiago, Chile",
@@ -174,8 +174,8 @@ public class EmailTemplateBuilder {
             "<p class=\"note\">Si necesitas cancelar o reagendar, " +
             "contáctanos con al menos 24 horas de anticipación.</p>" +
             "<p class=\"note\">¿Tienes dudas? Escríbenos a " +
-            "<a href=\"mailto:contacto@sglabogados.cl\" style=\"color:#C9A84C;\">" +
-            "contacto@sglabogados.cl</a></p>";
+            "<a href=\"mailto:contacto@alexcontreras.cl\" style=\"color:#C9A84C;\">" +
+            "contacto@alexcontreras.cl</a></p>";
 
         return wrap(
             "Estudio Jurídico · Santiago, Chile",
@@ -206,8 +206,8 @@ public class EmailTemplateBuilder {
             "</table></div>" +
             "<p class=\"note\">Por favor, preséntate con al menos 5 minutos de anticipación.</p>" +
             "<p class=\"note\">¿Tienes dudas? Escríbenos a " +
-            "<a href=\"mailto:contacto@sglabogados.cl\" style=\"color:#C9A84C;\">" +
-            "contacto@sglabogados.cl</a></p>";
+            "<a href=\"mailto:contacto@alexcontreras.cl\" style=\"color:#C9A84C;\">" +
+            "contacto@alexcontreras.cl</a></p>";
 
         return wrap(
             "Estudio Jurídico · Santiago, Chile",
@@ -272,8 +272,8 @@ public class EmailTemplateBuilder {
             "<p class=\"note\">Si crees que esto fue un error o deseas agendar una nueva consulta, " +
             "contáctanos y te ayudaremos a la brevedad.</p>" +
             "<p class=\"note\">¿Tienes dudas? Escríbenos a " +
-            "<a href=\"mailto:contacto@sglabogados.cl\" style=\"color:#C9A84C;\">" +
-            "contacto@sglabogados.cl</a></p>";
+            "<a href=\"mailto:contacto@alexcontreras.cl\" style=\"color:#C9A84C;\">" +
+            "contacto@alexcontreras.cl</a></p>";
 
         return wrap(
             "Estudio Jurídico · Santiago, Chile",
@@ -305,8 +305,8 @@ public class EmailTemplateBuilder {
             "<p class=\"note\">Si necesitas realizar algún cambio adicional, " +
             "contáctanos con al menos 24 horas de anticipación.</p>" +
             "<p class=\"note\">¿Tienes dudas? Escríbenos a " +
-            "<a href=\"mailto:contacto@sglabogados.cl\" style=\"color:#C9A84C;\">" +
-            "contacto@sglabogados.cl</a></p>";
+            "<a href=\"mailto:contacto@alexcontreras.cl\" style=\"color:#C9A84C;\">" +
+            "contacto@alexcontreras.cl</a></p>";
 
         return wrap(
             "Estudio Jurídico · Santiago, Chile",

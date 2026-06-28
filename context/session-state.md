@@ -6,7 +6,7 @@
 ## Estado actual
 - **Release activo:** R2
 - **Fase:** Desarrollo
-- **Última historia completada:** UI LP-CONTACT-INFO — dominio alexcontreras.cl, Av. Providencia 133, WhatsApp sandbox, modo claro/oscuro público WCAG 2.1 AA
+- **Última historia completada:** SGL-027 AG-CAPTCHA — Cloudflare Turnstile anti-bot en flujo de agendamiento
 - **En desarrollo:** SGL-084 NFR-TZ, SGL-096 NFR-COMPAT
 - **Próxima historia:** SGL-084 NFR-TZ
 
@@ -118,6 +118,7 @@
 | SGL-008 | LP-ROBOTS | public/robots.txt (Allow /, Disallow /admin/, Sitemap) | 28/06/2026 |
 | UI | LP-LIGHT-MODE | global.css (html[data-theme="light"] palette WCAG AA), BaseLayout.astro (forceDark prop + inline no-flash script), NavbarPublica.astro (toggle sol/luna + script localStorage), AdminLayout.astro (forceDark=true) | 28/06/2026 |
 | UI | LP-CONTACT-INFO | index.astro (email contacto@alexcontreras.cl, Av. Providencia 133, wa.me/14155238886), LoginForm.tsx (placeholder admin@alexcontreras.cl) | 28/06/2026 |
+| SGL-027 | AG-CAPTCHA | TurnstileService.java, CaptchaController.java, CaptchaVerifyRequest.java, HttpClientConfig.java, TurnstileServiceTest.java (+5 casos), SecurityConfig.java (/api/captcha/** public), application.yml (turnstile.secret-key), BaseLayout.astro (script Turnstile), PasoDatos.tsx (widget + verify async), postman | 28/06/2026 |
 
 ## Historias R2 en desarrollo
 | ID | Alias | Estado |
