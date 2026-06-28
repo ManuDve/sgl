@@ -40,7 +40,9 @@
       "Bash(curl -s \"http://localhost:4322/gestionar?id=AG-ABCD-0001\")",
       "Bash(node *)",
       "Bash(pip3 install *)",
-      "Bash(brew install *)"
+      "Bash(brew install *)",
+      "Bash(npm install *)",
+      "Bash(npm ls *)"
     ]
   }
 }
