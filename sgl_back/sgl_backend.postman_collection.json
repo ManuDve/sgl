@@ -1,0 +1,1079 @@
+{
+  "info": {
+    "_postman_id": "3ec6097c-8041-4adb-8803-1f4c5de175bd",
+    "name": "SGL Backend",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "27268222"
+  },
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "GET Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Servicios - Admin",
+      "item": [
+        {
+          "name": "POST Crear servicio",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Divorcio Contencioso\",\n  \"description\": \"Tramite de divorcio con contestacion\",\n  \"price\": 500000,\n  \"active\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/services",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "services"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Listar servicios",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/services",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "services"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Servicio por ID",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/services/{{serviceId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "services",
+                "{{serviceId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT Actualizar servicio",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Divorcio Contencioso Actualizado\",\n  \"price\": 550000\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/services/{{serviceId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "services",
+                "{{serviceId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE Eliminar servicio",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/services/{{serviceId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "services",
+                "{{serviceId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH Actualizar precio de servicio",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"precio\": 450000\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/services/{{serviceId}}/precio",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "services",
+                "{{serviceId}}",
+                "precio"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Historial de precios de servicio",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/services/{{serviceId}}/historial-precios",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "services",
+                "{{serviceId}}",
+                "historial-precios"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Servicios - Publico",
+      "item": [
+        {
+          "name": "GET Servicios activos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/public/services",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "public",
+                "services"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Servicios públicos",
+      "item": [
+        {
+          "name": "GET Servicios disponibles",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/services",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "services"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Agendamiento público",
+      "item": [
+        {
+          "name": "POST Crear agendamiento",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombreCliente\": \"Juan Pérez González\",\n  \"email\": \"juan.perez@gmail.com\",\n  \"telefono\": \"+56912345678\",\n  \"serviceId\": 1,\n  \"fecha\": \"2026-06-10\",\n  \"hora\": \"10:00:00\",\n  \"aceptaTerminos\": true,\n  \"descripcion\": \"Necesito orientación sobre un proceso de divorcio de mutuo acuerdo.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/appointments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "appointments"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Solicitar OTP (GES-OTP)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"ana.martinez@example.com\",\n  \"telefono\": null\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/appointments/{{idExterno}}/request-otp",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "appointments",
+                "{{idExterno}}",
+                "request-otp"
+              ]
+            },
+            "description": "Solicita un OTP de verificación de identidad para gestionar una cita. Proporcionar email O teléfono que coincida con la cita. La respuesta es siempre 200 para evitar enumeración. SGL-066 GES-OTP."
+          },
+          "response": []
+        },
+        {
+          "name": "POST Verificar OTP — token de gestión (GES-VERIFY)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"otp\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/appointments/{{idExterno}}/verify-otp",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "appointments",
+                "{{idExterno}}",
+                "verify-otp"
+              ]
+            },
+            "description": "Verifica el OTP enviado al cliente. Si es válido retorna un JWT de gestión (10 min) para reagendar/cancelar la cita. Si es inválido retorna 401. SGL-067 GES-VERIFY."
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH Reagendar cita (GES-REAG-WEB)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{gestionToken}}",
+                "description": "Token de gestión obtenido en POST verify-otp (válido 10 min)"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fecha\": \"2026-07-15\",\n  \"hora\": \"11:00:00\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/appointments/{{idExterno}}/reagendar",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "appointments",
+                "{{idExterno}}",
+                "reagendar"
+              ]
+            },
+            "description": "Reagenda la cita indicada por {{idExterno}}. Requiere el token de gestión emitido por verify-otp en el header Authorization. Políticas: mínimo 24h de anticipación, slot disponible, cita no CANCELLED. Si estaba CONFIRMED, el estado vuelve a PENDING. SGL-064 GES-REAG-WEB."
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH Cancelar cita (GES-CANCEL-WEB)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{gestionToken}}",
+                "description": "Token de gestión obtenido en POST verify-otp (válido 10 min)"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/appointments/{{idExterno}}/cancelar",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "appointments",
+                "{{idExterno}}",
+                "cancelar"
+              ]
+            },
+            "description": "Cancela la cita indicada por {{idExterno}}. Requiere el token de gestión emitido por verify-otp en el header Authorization. Sin body. Políticas: mínimo 24h de anticipación, cita no CANCELLED. Retorna 200 o 422. SGL-065 GES-CANCEL-WEB."
+          },
+          "response": []
+        },
+        {
+          "name": "GET Días hábiles disponibles",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/appointments/days-available?days=30",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "appointments",
+                "days-available"
+              ],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "days",
+                  "value": "30"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Horas disponibles",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/appointments/hours-available?date=2026-06-01",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "appointments",
+                "hours-available"
+              ],
+              "query": [
+                {
+                  "key": "date",
+                  "value": "2026-06-01"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Ping agendamiento",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/appointments/ping",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "appointments",
+                "ping"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Agendamientos - Admin",
+      "item": [
+        {
+          "name": "GET Listar agendamientos pendientes (legacy status)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/appointments?status=pending",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "appointments"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "pending"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Filtrar agendamientos (search + estado + rango fechas)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/appointments?search=juan&estado=PENDING&desde=2026-06-01&hasta=2026-06-30",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "appointments"
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "juan",
+                  "description": "Busca en nombre, email e idExterno (case-insensitive)"
+                },
+                {
+                  "key": "estado",
+                  "value": "PENDING",
+                  "description": "PENDING | CONFIRMED | CANCELLED | RESCHEDULED (inglés o español)"
+                },
+                {
+                  "key": "desde",
+                  "value": "2026-06-01",
+                  "description": "Fecha mínima inclusiva YYYY-MM-DD"
+                },
+                {
+                  "key": "hasta",
+                  "value": "2026-06-30",
+                  "description": "Fecha máxima inclusiva YYYY-MM-DD"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH Reagendar cita admin (GES-ADMIN-REAG)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fecha\": \"2026-07-20\",\n  \"hora\": \"11:00:00\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/appointments/{{appointmentId}}/reagendar",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "appointments",
+                "{{appointmentId}}",
+                "reagendar"
+              ]
+            },
+            "description": "Reagenda una cita desde el panel admin. Sin restricción de 24h. Valida disponibilidad del slot y que la cita no esté CANCELLED. Si estaba CONFIRMED, vuelve a PENDING. Requiere JWT admin. SGL-071 GES-ADMIN-REAG."
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH Confirmar pago",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigoTransaccion\": \"123456789\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/appointments/{{appointmentId}}/pago",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "appointments",
+                "{{appointmentId}}",
+                "pago"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH Cambiar estado",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"CONFIRMADO\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/appointments/{{appointmentId}}/estado",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "appointments",
+                "{{appointmentId}}",
+                "estado"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Exportar agendamientos CSV",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/appointments/export?desde=2026-01-01&hasta=2026-12-31",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "appointments",
+                "export"
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "Busca en nombre, email e idExterno",
+                  "disabled": true
+                },
+                {
+                  "key": "estado",
+                  "value": "",
+                  "description": "PENDING | CONFIRMED | CANCELLED | RESCHEDULED",
+                  "disabled": true
+                },
+                {
+                  "key": "desde",
+                  "value": "2026-01-01",
+                  "description": "Fecha mínima inclusiva YYYY-MM-DD"
+                },
+                {
+                  "key": "hasta",
+                  "value": "2026-12-31",
+                  "description": "Fecha máxima inclusiva YYYY-MM-DD"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Detalle de agendamiento",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/appointments/{{appointmentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "appointments",
+                "{{appointmentId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Listar todos los agendamientos",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/appointments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "appointments"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Calendario (semana 1 de mayo)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/appointments/calendario?mes=2026-05&semana=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "appointments",
+                "calendario"
+              ],
+              "query": [
+                {
+                  "key": "mes",
+                  "value": "2026-05",
+                  "description": "Mes en formato YYYY-MM"
+                },
+                {
+                  "key": "semana",
+                  "value": "1",
+                  "description": "Semana dentro del mes (1-indexado, default: 1)"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Notificaciones - Admin",
+      "item": [
+        {
+          "name": "GET Historial de notificaciones por agendamiento",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/notifications/log?appointmentId={{appointmentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "notifications",
+                "log"
+              ],
+              "query": [
+                {
+                  "key": "appointmentId",
+                  "value": "{{appointmentId}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Auditoría - Admin",
+      "item": [
+        {
+          "name": "GET Historial de auditoría paginado",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/audit?page=0&size=20",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "audit"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0",
+                  "description": "Número de página (0-indexed)"
+                },
+                {
+                  "key": "size",
+                  "value": "20",
+                  "description": "Tamaño de página"
+                }
+              ]
+            },
+            "description": "Lista acciones administrativas: LOGIN, CAMBIO_ESTADO, CONFIRMAR_PAGO, CAMBIO_PRECIO. Requiere JWT. SGL-055 ADM-AUDIT."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "POST Login admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{adminPassword}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "adminToken",
+      "value": ""
+    },
+    {
+      "key": "serviceId",
+      "value": "1"
+    },
+    {
+      "key": "appointmentId",
+      "value": "1"
+    },
+    {
+      "key": "adminEmail",
+      "value": "admin@sgl.cl"
+    },
+    {
+      "key": "adminPassword",
+      "value": "admin123"
+    },
+    {
+      "key": "idExterno",
+      "value": "AG-XXXX-0001",
+      "description": "ID externo de la cita (formato AG-XXXX-NNNN) — reemplazar antes de ejecutar"
+    },
+    {
+      "key": "gestionToken",
+      "value": "",
+      "description": "Token de gestión retornado por POST verify-otp — copiar aquí antes de reagendar"
+    }
+  ]
+}

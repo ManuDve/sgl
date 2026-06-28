@@ -1,0 +1,478 @@
+import { useState, useEffect, useCallback } from "react";
+import ConfirmPaymentModal from "./ConfirmPaymentModal";
+import RescheduleModal from "./RescheduleModal";
+import CancelAppointmentModal from "./CancelAppointmentModal";
+
+interface NotificationLogEntry {
+  id:           number;
+  appointmentId: number;
+  tipo:         string;
+  canal:        string;
+  destinatario: string;
+  estado:       string;
+  fechaEnvio:   string;
+  error:        string | null;
+}
+
+interface AppointmentDetail {
+  id: number;
+  idExterno: string;
+  nombreCliente: string;
+  email: string;
+  telefono: string;
+  servicioId: number;
+  materia: string;
+  descripcionServicio: string;
+  descripcion?: string;
+  fecha: string;
+  hora: string;
+  monto: number;
+  estado: string;
+  reagendado: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+const TIPO_LABEL: Record<string, string> = {
+  CONFIRMACION_CLIENTE: "Confirmación",
+  NOTIF_ADMIN:          "Notif. admin",
+  REMINDER_24H:         "Recordatorio 24h",
+  REMINDER_2H:          "Recordatorio 2h",
+};
+
+const NOTIF_ESTADO_BADGE: Record<string, string> = {
+  ENVIADO: "inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-green-500/20 text-green-400 border border-green-500/30",
+  FALLIDO: "inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-red-500/20 text-red-400 border border-red-500/30",
+};
+
+const BADGE_CLASS: Record<string, string> = {
+  PENDING:   "bg-sgl-gold/20 text-sgl-gold border border-sgl-gold/30",
+  CONFIRMED: "bg-green-500/20 text-green-400 border border-green-500/30",
+  CANCELLED: "bg-red-500/20 text-red-400 border border-red-500/30",
+};
+
+const ESTADO_LABEL: Record<string, string> = {
+  PENDING:   "Pendiente",
+  CONFIRMED: "Confirmado",
+  CANCELLED: "Cancelado",
+};
+
+function formatFecha(fecha: string) {
+  const [y, m, d] = fecha.split("-");
+  return `${d}/${m}/${y}`;
+}
+
+function formatHora(hora: string) { return hora.slice(0, 5); }
+
+function formatMonto(monto: number) {
+  return `$${monto.toLocaleString("es-CL")}`;
+}
+
+function formatDateTime(dt: string) {
+  return new Date(dt).toLocaleString("es-CL", { dateStyle: "short", timeStyle: "short" });
+}
+
+interface FieldProps { label: string; value: string | React.ReactNode; }
+
+function Field({ label, value }: FieldProps) {
+  return (
+    <div className="flex flex-col gap-1">
+      <span className="font-sans text-xs text-sgl-gray-mid uppercase tracking-wider">{label}</span>
+      <span className="font-sans text-sm text-sgl-white">{value}</span>
+    </div>
+  );
+}
+
+interface Props {
+  id: number | null;
+  onClose: () => void;
+  onStatusChanged?: () => void;
+}
+
+export default function AppointmentDetail({ id, onClose, onStatusChanged }: Props) {
+  const [detail,   setDetail]   = useState<AppointmentDetail | null>(null);
+  const [loading,  setLoading]  = useState(false);
+  const [error,    setError]    = useState("");
+  const [paymentModal,    setPaymentModal]    = useState(false);
+  const [rescheduleModal, setRescheduleModal] = useState(false);
+  const [cancelModal,     setCancelModal]     = useState(false);
+  const [mounted,         setMounted]         = useState(false);
+
+  const [notifOpen,    setNotifOpen]    = useState(false);
+  const [notifLogs,    setNotifLogs]    = useState<NotificationLogEntry[] | null>(null);
+  const [notifLoading, setNotifLoading] = useState(false);
+  const [notifError,   setNotifError]   = useState("");
+
+  const resetNotif = useCallback(() => {
+    setNotifOpen(false);
+    setNotifLogs(null);
+    setNotifLoading(false);
+    setNotifError("");
+  }, []);
+
+  const handleClose = useCallback(() => {
+    setDetail(null);
+    setError("");
+    setPaymentModal(false);
+    setRescheduleModal(false);
+    setCancelModal(false);
+    resetNotif();
+    onClose();
+  }, [onClose, resetNotif]);
+
+  // Animación de entrada — un frame después del mount
+  useEffect(() => {
+    if (id === null) { setMounted(false); return; }
+    const t = setTimeout(() => setMounted(true), 10);
+    return () => { clearTimeout(t); setMounted(false); };
+  }, [id]);
+
+  useEffect(() => {
+    if (id === null) return;
+    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") handleClose(); };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [id, handleClose]);
+
+  useEffect(() => {
+    if (id === null) return;
+    resetNotif();
+    setCancelModal(false);
+  }, [id, resetNotif]);
+
+  async function fetchNotifLogs() {
+    const token = localStorage.getItem("sgl_token");
+    if (!token || id === null) return;
+    setNotifLoading(true);
+    setNotifError("");
+    try {
+      const res = await fetch(
+        `http://localhost:8080/api/admin/notifications/log?appointmentId=${id}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (res.status === 401) { localStorage.removeItem("sgl_token"); window.location.href = "/admin/login"; return; }
+      if (!res.ok) throw new Error();
+      const body = await res.json();
+      setNotifLogs(body.data ?? []);
+    } catch {
+      setNotifError("No se pudo cargar el historial.");
+    } finally {
+      setNotifLoading(false);
+    }
+  }
+
+  function toggleNotifSection() {
+    const next = !notifOpen;
+    setNotifOpen(next);
+    if (next && notifLogs === null && !notifLoading) fetchNotifLogs();
+  }
+
+  useEffect(() => {
+    if (id === null) return;
+    const token = localStorage.getItem("sgl_token");
+    if (!token) { window.location.href = "/admin/login"; return; }
+
+    setLoading(true);
+    setError("");
+    setDetail(null);
+
+    fetch(`http://localhost:8080/api/admin/appointments/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => {
+        if (res.status === 401) { localStorage.removeItem("sgl_token"); window.location.href = "/admin/login"; return null; }
+        if (!res.ok) throw new Error();
+        return res.json();
+      })
+      .then((body) => { if (body) setDetail(body.data); })
+      .catch(() => setError("No se pudo cargar el detalle."))
+      .finally(() => setLoading(false));
+  }, [id]);
+
+  if (id === null) return null;
+
+  // Modal secundario de confirmación de pago
+  const paymentOverlay = paymentModal && detail ? (
+    <ConfirmPaymentModal
+      appointmentId={detail.id}
+      idExterno={detail.idExterno}
+      nombreCliente={detail.nombreCliente}
+      monto={detail.monto}
+      onClose={() => setPaymentModal(false)}
+      onSuccess={() => { onStatusChanged?.(); handleClose(); }}
+    />
+  ) : null;
+
+  // Modal secundario de reagendamiento
+  const rescheduleOverlay = rescheduleModal && detail ? (
+    <RescheduleModal
+      appointmentId={detail.id}
+      idExterno={detail.idExterno}
+      nombreCliente={detail.nombreCliente}
+      servicioId={detail.servicioId}
+      materia={detail.materia}
+      monto={detail.monto}
+      onClose={() => setRescheduleModal(false)}
+      onSuccess={() => { onStatusChanged?.(); handleClose(); }}
+    />
+  ) : null;
+
+  // Modal secundario de cancelación
+  const cancelOverlay = cancelModal && detail ? (
+    <CancelAppointmentModal
+      appointmentId={detail.id}
+      idExterno={detail.idExterno}
+      nombreCliente={detail.nombreCliente}
+      onClose={() => setCancelModal(false)}
+      onSuccess={() => { onStatusChanged?.(); handleClose(); }}
+    />
+  ) : null;
+
+  return (
+    <>
+    {paymentOverlay}
+    {rescheduleOverlay}
+    {cancelOverlay}
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
+      onClick={handleClose}
+      style={{
+        background: `rgba(0,0,0,${mounted ? 0.6 : 0})`,
+        transition: "background 220ms ease",
+      }}
+    >
+      <div
+        className="bg-sgl-gray border border-sgl-gold/30 rounded-lg w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-xl"
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          opacity:   mounted ? 1 : 0,
+          transform: mounted ? "translateY(0) scale(1)" : "translateY(18px) scale(0.97)",
+          transition: mounted
+            ? "opacity 300ms cubic-bezier(0.16,1,0.3,1), transform 300ms cubic-bezier(0.16,1,0.3,1)"
+            : "none",
+        }}
+      >
+
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-sgl-gold/20">
+          <div>
+            <h2 className="font-serif text-lg font-semibold text-sgl-white">Detalle del agendamiento</h2>
+            {detail && <p className="font-sans text-xs text-sgl-gray-mid mt-0.5">{detail.idExterno}</p>}
+          </div>
+          <button onClick={handleClose} aria-label="Cerrar"
+            className="text-sgl-gray-mid hover:text-sgl-white transition-colors duration-150 p-1 rounded">
+            <svg className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd"/>
+            </svg>
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="px-6 py-5">
+          {loading && (
+            <div className="flex items-center justify-center gap-3 py-10 text-sgl-gray-mid font-sans text-sm">
+              <span className="w-4 h-4 border-2 border-sgl-gold/40 border-t-sgl-gold rounded-full animate-spin" />
+              Cargando…
+            </div>
+          )}
+
+          {error && (
+            <div className="bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-3 text-red-400 font-sans text-sm">
+              {error}
+            </div>
+          )}
+
+          {detail && (
+            <div className="flex flex-col gap-6">
+
+              {/* Estado */}
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${BADGE_CLASS[detail.estado] ?? BADGE_CLASS.PENDING}`}>
+                  {ESTADO_LABEL[detail.estado] ?? detail.estado}
+                </span>
+                {detail.reagendado && (
+                  <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-500/15 text-blue-400 border border-blue-500/25">
+                    Reagendado
+                  </span>
+                )}
+              </div>
+
+              {/* Cita */}
+              <section className="flex flex-col gap-3">
+                <h3 className="font-sans text-xs font-semibold text-sgl-gold uppercase tracking-wider border-b border-sgl-gold/10 pb-1">Cita</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <Field label="Fecha"      value={formatFecha(detail.fecha)} />
+                  <Field label="Hora"       value={formatHora(detail.hora)} />
+                  <Field label="Monto"      value={formatMonto(detail.monto)} />
+                  <Field label="ID externo" value={detail.idExterno} />
+                </div>
+              </section>
+
+              {/* Cliente */}
+              <section className="flex flex-col gap-3">
+                <h3 className="font-sans text-xs font-semibold text-sgl-gold uppercase tracking-wider border-b border-sgl-gold/10 pb-1">Cliente</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <Field label="Nombre"   value={detail.nombreCliente} />
+                  <Field label="Teléfono" value={detail.telefono || "—"} />
+                  <div className="col-span-2"><Field label="Email" value={detail.email} /></div>
+                </div>
+              </section>
+
+              {/* Servicio */}
+              <section className="flex flex-col gap-3">
+                <h3 className="font-sans text-xs font-semibold text-sgl-gold uppercase tracking-wider border-b border-sgl-gold/10 pb-1">Servicio</h3>
+                <Field label="Materia" value={detail.materia} />
+                {detail.descripcionServicio && <Field label="Descripción" value={detail.descripcionServicio} />}
+              </section>
+
+              {/* Descripción del caso */}
+              {detail.descripcion && (
+                <section className="flex flex-col gap-3">
+                  <h3 className="font-sans text-xs font-semibold text-sgl-gold uppercase tracking-wider border-b border-sgl-gold/10 pb-1">Descripción del caso</h3>
+                  <div className="max-h-28 overflow-y-auto pr-1">
+                    <p className="font-sans text-sm text-sgl-gray-mid leading-relaxed whitespace-pre-wrap">
+                      {detail.descripcion}
+                    </p>
+                  </div>
+                </section>
+              )}
+
+              {/* Auditoría */}
+              <section className="flex flex-col gap-3">
+                <h3 className="font-sans text-xs font-semibold text-sgl-gold uppercase tracking-wider border-b border-sgl-gold/10 pb-1">Registro</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <Field label="Creado"      value={formatDateTime(detail.createdAt)} />
+                  <Field label="Actualizado" value={formatDateTime(detail.updatedAt)} />
+                </div>
+              </section>
+
+              {/* Historial de notificaciones — colapsable */}
+              <section className="flex flex-col gap-2">
+                <button
+                  onClick={toggleNotifSection}
+                  className="flex items-center justify-between w-full border-b border-sgl-gold/10 pb-1 group text-left"
+                >
+                  <h3 className="font-sans text-xs font-semibold text-sgl-gold uppercase tracking-wider">
+                    Historial de notificaciones
+                  </h3>
+                  <svg
+                    className="w-3.5 h-3.5 text-sgl-gold/60 group-hover:text-sgl-gold transition-colors duration-150 shrink-0"
+                    viewBox="0 0 20 20" fill="currentColor"
+                    style={{ transform: notifOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 200ms ease" }}
+                  >
+                    <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd"/>
+                  </svg>
+                </button>
+
+                {notifOpen && (
+                  <div className="mt-1">
+                    {notifLoading && (
+                      <div className="flex flex-col gap-2">
+                        {[0, 1, 2].map((i) => (
+                          <div key={i} className="h-7 rounded" style={{
+                            background: "linear-gradient(90deg,#1f1f1f 0%,#2a2a2a 50%,#1f1f1f 100%)",
+                            backgroundSize: "200% 100%",
+                            animation: "shimmer 1.6s ease-in-out infinite",
+                          }} />
+                        ))}
+                      </div>
+                    )}
+
+                    {notifError && (
+                      <p className="font-sans text-xs text-red-400 py-2">{notifError}</p>
+                    )}
+
+                    {!notifLoading && !notifError && notifLogs?.length === 0 && (
+                      <p className="font-sans text-xs text-sgl-gray-mid py-2 text-center">
+                        Sin notificaciones registradas.
+                      </p>
+                    )}
+
+                    {!notifLoading && !notifError && notifLogs && notifLogs.length > 0 && (
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-xs font-sans">
+                          <thead>
+                            <tr className="border-b border-white/10">
+                              <th className="text-left py-2 pr-3 text-sgl-gray-mid font-medium">Tipo</th>
+                              <th className="text-left py-2 pr-3 text-sgl-gray-mid font-medium">Canal</th>
+                              <th className="text-left py-2 pr-3 text-sgl-gray-mid font-medium">Estado</th>
+                              <th className="text-left py-2 pr-3 text-sgl-gray-mid font-medium whitespace-nowrap">Fecha envío</th>
+                              <th className="text-left py-2 text-sgl-gray-mid font-medium">Error</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {notifLogs.map((log) => (
+                              <tr key={log.id} className="border-b border-white/5 last:border-0">
+                                <td className="py-2 pr-3 text-sgl-white whitespace-nowrap">
+                                  {TIPO_LABEL[log.tipo] ?? log.tipo}
+                                </td>
+                                <td className="py-2 pr-3 text-sgl-gray-mid">{log.canal}</td>
+                                <td className="py-2 pr-3">
+                                  <span className={NOTIF_ESTADO_BADGE[log.estado] ?? "text-sgl-gray-mid"}>
+                                    {log.estado}
+                                  </span>
+                                </td>
+                                <td className="py-2 pr-3 text-sgl-gray-mid whitespace-nowrap">
+                                  {formatDateTime(log.fechaEnvio)}
+                                </td>
+                                <td className="py-2 text-red-400 max-w-[120px]">
+                                  {log.error ? (
+                                    <span className="block truncate" title={log.error}>{log.error}</span>
+                                  ) : (
+                                    <span className="text-sgl-gray-mid">—</span>
+                                  )}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </section>
+
+            </div>
+          )}
+        </div>
+
+        {/* Footer con acciones */}
+        {detail && (
+          <div className="px-6 py-4 border-t border-sgl-gold/10 flex items-center justify-between gap-3">
+            <button onClick={handleClose}
+              className="border border-sgl-gold/40 text-sgl-gold hover:border-sgl-gold hover:bg-sgl-gold/10 font-semibold px-5 py-2 rounded text-sm transition-colors duration-200">
+              Cerrar
+            </button>
+            <div className="flex items-center gap-2">
+              {detail.estado === "PENDING" && (
+                <button
+                  onClick={() => setPaymentModal(true)}
+                  className="bg-sgl-gold hover:bg-sgl-gold-light text-sgl-black font-semibold px-5 py-2 rounded text-sm transition-colors duration-200"
+                >
+                  Confirmar pago
+                </button>
+              )}
+              {detail.estado !== "CANCELLED" && (
+                <button
+                  onClick={() => setRescheduleModal(true)}
+                  className="border border-sgl-gold/50 text-sgl-gold hover:border-sgl-gold hover:bg-sgl-gold/10 font-semibold px-5 py-2 rounded text-sm transition-colors duration-200"
+                >
+                  Reagendar
+                </button>
+              )}
+              {(detail.estado === "PENDING" || detail.estado === "CONFIRMED") && (
+                <button
+                  onClick={() => setCancelModal(true)}
+                  className="border border-red-500/60 text-red-400 hover:bg-red-500/10 font-semibold px-5 py-2 rounded text-sm transition-colors duration-200"
+                >
+                  Cancelar
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+    </>
+  );
+}

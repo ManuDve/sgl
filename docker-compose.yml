@@ -1,0 +1,90 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: sgl_postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-sgl_db}
+      POSTGRES_USER: ${POSTGRES_USER:-sgl_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-sgl_pass}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - sgl_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-sgl_user} -d ${POSTGRES_DB:-sgl_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./sgl_back
+      dockerfile: Dockerfile
+    container_name: sgl_back
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-sgl_db}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-sgl_user}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-sgl_pass}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: ${SPRING_JPA_HIBERNATE_DDL_AUTO:-update}
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
+      SERVER_SERVLET_CONTEXT_PATH: ${SERVER_SERVLET_CONTEXT_PATH:-/api}
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - sgl_network
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./sgl_front
+      dockerfile: Dockerfile
+    container_name: sgl_frontend
+    environment:
+      PUBLIC_API_URL: ${PUBLIC_API_URL:-http://localhost:8080/api}
+    ports:
+      - "4321:4321"
+    depends_on:
+      - backend
+    networks:
+      - sgl_network
+    restart: unless-stopped
+
+  sgl_backup:
+    image: postgres:15-alpine
+    container_name: sgl_backup
+    labels:
+      # Excluye este servicio de la autoconfiguración de Spring Boot docker-compose
+      org.springframework.boot.ignore: "true"
+    environment:
+      POSTGRES_DB:       ${POSTGRES_DB:-sgl_db}
+      POSTGRES_USER:     ${POSTGRES_USER:-sgl_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-sgl_pass}
+      TZ:                America/Santiago
+    volumes:
+      - ./backup.sh:/backup.sh:ro
+      - ./backups:/backups
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - sgl_network
+    # Cron: 02:00 America/Santiago todos los días → 0 2 * * *
+    # Se invoca con "sh /backup.sh" para no requerir el bit de ejecución sobre el bind mount.
+    command: >
+      sh -c "echo '0 2 * * * sh /backup.sh >> /var/log/backup.log 2>&1' | crontab - &&
+             crond -f -l 2"
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  sgl_network:
+    driver: bridge

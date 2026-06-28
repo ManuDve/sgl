@@ -1,0 +1,51 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+import LogoutButton from "../components/admin/LogoutButton";
+
+const { title = "Admin — SGL" } = Astro.props;
+const pathname = Astro.url.pathname;
+
+function navClass(href: string) {
+  const active = pathname.startsWith(href);
+  return `font-sans text-sm transition-colors duration-150 pb-0.5 border-b ${
+    active
+      ? "text-sgl-white border-sgl-gold"
+      : "text-sgl-gray-mid border-transparent hover:text-sgl-white hover:border-sgl-gold/40"
+  }`;
+}
+---
+
+<BaseLayout title={title} showNav={false}>
+  <div class="min-h-screen flex flex-col">
+    <header class="bg-sgl-black/95 backdrop-blur border-b border-sgl-gold/20 sticky top-0 z-10">
+      <nav class="max-w-6xl mx-auto px-4 md:px-8 h-14 md:h-16 flex items-center justify-between gap-3 md:gap-6">
+        <!-- Logo -->
+        <span class="font-serif text-lg md:text-xl text-sgl-white shrink-0">
+          SGL<span class="text-sgl-gold">.</span>
+          <span class="font-sans text-xs md:text-sm text-sgl-gray-mid ml-1.5">Admin</span>
+        </span>
+
+        <!-- Links — ocultos en móvil, visibles desde md -->
+        <div class="hidden md:flex items-center gap-5 md:gap-7">
+          <a href="/admin/dashboard"  class={navClass("/admin/dashboard")}>Dashboard</a>
+          <a href="/admin/servicios"  class={navClass("/admin/servicios")}>Servicios</a>
+          <a href="/admin/calendario" class={navClass("/admin/calendario")}>Calendario</a>
+          <a href="/admin/auditoria"  class={navClass("/admin/auditoria")}>Auditoría</a>
+        </div>
+
+        <!-- Derecha: página actual en móvil + logout -->
+        <div class="flex items-center gap-3">
+          <!-- Indicador de sección actual solo en móvil -->
+          <span class="md:hidden font-sans text-xs text-sgl-gray-mid capitalize">
+            {pathname.split("/admin/")[1] ?? "dashboard"}
+          </span>
+          <LogoutButton client:load />
+        </div>
+      </nav>
+    </header>
+
+    <main class="flex-1 max-w-6xl mx-auto w-full px-4 md:px-8 py-10 md:py-12">
+      <slot />
+    </main>
+  </div>
+</BaseLayout>

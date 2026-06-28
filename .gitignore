@@ -1,0 +1,67 @@
+# Backups de base de datos — no versionar los archivos SQL
+backups/*.sql
+backups/*.sql.gz
+
+# build output
+sgl_front/dist/
+# generated types
+sgl_front/.astro/
+
+# dependencies
+sgl_front/node_modules/
+
+# logs
+sgl_front/npm-debug.log*
+sgl_front/yarn-debug.log*
+sgl_front/yarn-error.log*
+sgl_front/pnpm-debug.log*
+
+
+# environment variables
+sgl_front/.env
+sgl_front/.env.production
+
+# macOS-specific files
+sgl_front/.DS_Store
+
+# jetbrains setting folder
+sgl_front/.idea/
+
+sgl_back/HELP.md
+sgl_back/target/
+sgl_back/.mvn/wrapper/maven-wrapper.jar
+sgl_back/!**/src/main/**/target/
+sgl_back/!**/src/test/**/target/
+
+### STS ###
+sgl_back/.apt_generated
+sgl_back/.factorypath
+sgl_back/.project
+sgl_back/.settings
+sgl_back/.springBeans
+sgl_back/.sts4-cache
+
+### IntelliJ IDEA ###
+sgl_back/.idea
+sgl_back/*.iws
+sgl_back/*.iml
+sgl_back/*.ipr
+
+### NetBeans ###
+sgl_back/nbproject/private/
+sgl_back/nbbuild/
+sgl_back/dist/
+sgl_back/nbdist/
+sgl_back/.nb-gradle/
+sgl_back/build/
+sgl_back/!**/src/main/**/build/
+sgl_back/!**/src/test/**/build/
+
+### VS Code ###
+sgl_back/.vscode/
+
+.vscode/
+.idea/
+.DS_Store
+
+
