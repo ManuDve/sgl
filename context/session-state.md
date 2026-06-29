@@ -120,6 +120,7 @@
 | UI | LP-CONTACT-INFO | index.astro (email contacto@alexcontreras.cl, Av. Providencia 133, wa.me/14155238886), LoginForm.tsx (placeholder admin@alexcontreras.cl) | 28/06/2026 |
 | SGL-027 | AG-CAPTCHA | TurnstileService.java, CaptchaController.java, CaptchaVerifyRequest.java, HttpClientConfig.java, TurnstileServiceTest.java (+5 casos), SecurityConfig.java (/api/captcha/** public), application.yml (turnstile.secret-key), BaseLayout.astro (script Turnstile), PasoDatos.tsx (widget + verify async), postman | 28/06/2026 |
 | SGL-095 | OPS-DEPLOY | sgl_back/Dockerfile, sgl_front/Dockerfile, docker-compose.prod.yml, Caddyfile, .env.example, DEPLOY.md, sgl_front/src/config/api.ts, 26 archivos TSX/Astro (PUBLIC_API_URL) | 28/06/2026 |
+| FIX | NOTIF-PAGO-PENDIENTE | TipoEmail (+AVISO_PAGO_PENDIENTE), EmailTemplateBuilder (+buildPendingPaymentEmail), EmailService (+sendPendingPaymentEmail, +buildPendingPaymentMail, retryEmail switch), AppointmentService#createAppointment (+llamada email cliente), AppointmentServiceTest (+verify), WhatsAppService (buildFreeformMessage y buildPaymentConfirmedMessage mejorados con tildes), ServiciosLanding.tsx (nuevo client-side), index.astro (eliminado SSG fetch) | 29/06/2026 |
 
 ## Historias R2 en desarrollo
 | ID | Alias | Estado |

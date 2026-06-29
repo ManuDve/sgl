@@ -152,6 +152,49 @@ public class EmailTemplateBuilder {
     }
 
     /**
+     * Email al cliente cuando se crea una reserva con pago pendiente.
+     * Incluye el código de reserva y las instrucciones para completar el pago.
+     * Se envía inmediatamente al crear el agendamiento.
+     */
+    public String buildPendingPaymentEmail(Appointment a) {
+        String body =
+            "<p style=\"font-size:16px;color:#222;margin:0 0 14px;\">Estimado/a " +
+            "<strong>" + a.getNombreCliente() + "</strong>,</p>" +
+            "<p class=\"note\">Recibimos tu solicitud de consulta legal. " +
+            "Tu reserva quedó registrada con el siguiente código:</p>" +
+            "<p style=\"margin:0 0 20px;\"><span class=\"id\">" + a.getIdExterno() + "</span>" +
+            "&nbsp;&nbsp;<span class=\"badge\">PENDIENTE</span></p>" +
+            "<div class=\"box\"><table>" +
+            "<tr><td class=\"lbl\">Servicio</td>" +
+                "<td class=\"val\">" + a.getService().getName() + "</td></tr>" +
+            "<tr><td class=\"lbl\">Fecha</td>" +
+                "<td class=\"val\">" + formatFecha(a.getFecha()) + "</td></tr>" +
+            "<tr><td class=\"lbl\">Hora</td>" +
+                "<td class=\"val\">" + formatHora(a.getHora()) + "</td></tr>" +
+            "<tr><td class=\"lbl\">Monto a pagar</td>" +
+                "<td class=\"val\" style=\"color:#C9A84C;\">" + formatCLP(a.getMonto()) + "</td></tr>" +
+            "</table></div>" +
+            "<p class=\"note\"><strong>¿Cómo pagar?</strong> En la página de confirmación " +
+            "encontrarás los medios de pago disponibles (transferencia bancaria o tarjeta). " +
+            "Si cerraste esa ventana, puedes retomar el proceso desde " +
+            "<a href=\"https://alexcontreras.cl/gestionar\" style=\"color:#C9A84C;\">" +
+            "alexcontreras.cl/gestionar</a> usando tu código de reserva.</p>" +
+            "<p class=\"note\" style=\"background:#fff8e7;border-left:3px solid #C9A84C;" +
+            "padding:12px 16px;border-radius:3px;font-size:13px;\">" +
+            "Guarda tu código <strong style=\"color:#C9A84C;\">" + a.getIdExterno() + "</strong> " +
+            "— lo necesitarás para consultar el estado de tu cita, reagendar o cancelar.</p>" +
+            "<p class=\"note\">¿Tienes dudas? Escríbenos a " +
+            "<a href=\"mailto:contacto@alexcontreras.cl\" style=\"color:#C9A84C;\">" +
+            "contacto@alexcontreras.cl</a></p>";
+
+        return wrap(
+            "Estudio Jurídico · Santiago, Chile",
+            body,
+            "Este mensaje fue generado automáticamente, no respondas a este correo."
+        );
+    }
+
+    /**
      * Recordatorio de cita al cliente (24 h antes).
      * Historia: SGL-035 NOTIF-REMIND
      */

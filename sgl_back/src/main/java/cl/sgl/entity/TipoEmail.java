@@ -7,6 +7,7 @@ package cl.sgl.entity;
 public enum TipoEmail {
     CONFIRMACION_CLIENTE,
     NOTIF_ADMIN,
+    AVISO_PAGO_PENDIENTE,
     REMINDER_24H,
     REMINDER_2H,
     OTP_VERIFICACION,

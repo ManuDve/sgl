@@ -291,7 +291,10 @@ public class WhatsAppService {
 
     private String buildPaymentConfirmedMessage(Appointment appointment) {
         return String.format(
-            "Tu pago fue confirmado. Cita %s agendada para %s a las %s. ¡Te esperamos!",
+            "✅ ¡Tu pago fue confirmado, %s!\n\n" +
+            "Tu cita *%s* está reservada para el %s a las %s.\n\n" +
+            "Puedes consultar el estado en cualquier momento respondiendo *1* a este mensaje.",
+            appointment.getNombreCliente(),
             appointment.getIdExterno(),
             appointment.getFecha().format(VAR_DATE_FMT),
             appointment.getHora().format(TIME_FMT));
@@ -300,12 +303,13 @@ public class WhatsAppService {
     /** Texto libre para sesiones activas (el cliente escribió en las últimas 24h). */
     private String buildFreeformMessage(Appointment appointment) {
         return String.format(
-            "Hola, %s. Recibimos tu solicitud de consulta legal.\n\n" +
-            "ID: %s\n" +
+            "Hola, %s. Recibimos tu solicitud de consulta. 📋\n\n" +
+            "*Código de reserva: %s*\n" +
             "Servicio: %s\n" +
             "Fecha: %s\n" +
             "Hora: %s\n\n" +
-            "Revisa tu correo para las instrucciones de pago.",
+            "Revisa tu correo — ahí encontrarás las instrucciones de pago.\n" +
+            "Guarda tu código, lo necesitarás para gestionar tu cita.",
             appointment.getNombreCliente(),
             appointment.getIdExterno(),
             appointment.getService().getName(),

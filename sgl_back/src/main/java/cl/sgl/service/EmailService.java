@@ -96,6 +96,25 @@ public class EmailService {
     }
 
     /**
+     * Envía al cliente el aviso de reserva recibida con su código y las instrucciones de pago.
+     * Se llama inmediatamente al crear el agendamiento (estado PENDIENTE).
+     * Si falla, encola el reintento en email_retry_queue.
+     */
+    public void sendPendingPaymentEmail(Appointment appointment) {
+        try {
+            mailtrapClient.send(buildPendingPaymentMail(appointment));
+            notificationLogService.logSuccess(appointment.getId(), TipoEmail.AVISO_PAGO_PENDIENTE, appointment.getEmail());
+            log.info("Email de reserva pendiente enviado → {} [{}]",
+                appointment.getEmail(), appointment.getIdExterno());
+        } catch (Exception e) {
+            log.error("No se pudo enviar email de reserva pendiente para {} — {}",
+                appointment.getIdExterno(), e.getMessage());
+            notificationLogService.logFailure(appointment.getId(), TipoEmail.AVISO_PAGO_PENDIENTE, appointment.getEmail(), e.getMessage());
+            enqueueRetry(appointment.getId(), TipoEmail.AVISO_PAGO_PENDIENTE, e.getMessage());
+        }
+    }
+
+    /**
      * Envía al administrador una notificación de nuevo agendamiento.
      * Si ADMIN_EMAIL no está configurado, registra una advertencia y continúa.
      * Si falla el envío, encola el reintento.
@@ -157,6 +176,7 @@ public class EmailService {
         MailtrapMail mail = switch (entry.getTipoEmail()) {
             case CONFIRMACION_CLIENTE    -> buildConfirmationMail(appointment);
             case NOTIF_ADMIN             -> buildAdminMail(appointment);
+            case AVISO_PAGO_PENDIENTE    -> buildPendingPaymentMail(appointment);
             case REMINDER_24H            -> buildReminderMail(appointment, ReminderTipo.REMIND_24H);
             case REMINDER_2H             -> buildReminderMail(appointment, ReminderTipo.REMIND_2H);
             case CANCELACION_CLIENTE     -> buildCancellationMail(appointment);
@@ -175,6 +195,15 @@ public class EmailService {
     }
 
     // ── Mail builders ──────────────────────────────────────────────────────
+
+    private MailtrapMail buildPendingPaymentMail(Appointment appointment) {
+        return MailtrapMail.builder()
+            .from(new Address(fromEmail, FROM_NAME))
+            .to(List.of(new Address(appointment.getEmail())))
+            .subject("Reserva recibida — tu código es " + appointment.getIdExterno())
+            .html(templateBuilder.buildPendingPaymentEmail(appointment))
+            .build();
+    }
 
     private MailtrapMail buildConfirmationMail(Appointment appointment) {
         return MailtrapMail.builder()

@@ -450,8 +450,10 @@ class AppointmentServiceTest {
         assertEquals("Divorcio Contencioso", result.getMateria());
         verify(appointmentRepository).saveAndFlush(any(Appointment.class));
         verify(appointmentRepository).save(any(Appointment.class));
-        // El email de confirmación al cliente NO se envía al crear — solo al confirmar el pago
+        // El email de confirmación de pago NO se envía al crear — solo al confirmar el pago
         verify(emailService, never()).sendConfirmationEmail(any(Appointment.class));
+        // El aviso de reserva con código y aviso de pago SÍ se envía al cliente al crear
+        verify(emailService).sendPendingPaymentEmail(any(Appointment.class));
         // WhatsApp de confirmación al cliente SÍ se envía al crear (SGL-034)
         verify(whatsAppService).sendConfirmationWhatsApp(any(Appointment.class));
     }
