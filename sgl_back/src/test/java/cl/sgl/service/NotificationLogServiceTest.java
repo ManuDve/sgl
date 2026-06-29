@@ -4,13 +4,15 @@ import cl.sgl.dto.NotificationLogDTO;
 import cl.sgl.entity.NotificationLog;
 import cl.sgl.entity.TipoEmail;
 import cl.sgl.repository.NotificationLogRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -30,8 +32,19 @@ class NotificationLogServiceTest {
     @Mock
     private NotificationLogRepository repository;
 
-    @InjectMocks
+    @Mock
+    private PlatformTransactionManager txManager;
+
+    @Mock
+    private TransactionStatus txStatus;
+
     private NotificationLogService service;
+
+    @BeforeEach
+    void setUp() {
+        lenient().when(txManager.getTransaction(any())).thenReturn(txStatus);
+        service = new NotificationLogService(repository, txManager);
+    }
 
     // ── logSuccess ─────────────────────────────────────────────────────────
 
