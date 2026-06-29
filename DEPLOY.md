@@ -14,6 +14,10 @@ Servidor único con Docker Compose, PostgreSQL, Spring Boot y Astro detrás de C
 ### Instalar Docker en Ubuntu
 
 ```bash
+ssh root@64.176.9.202
+```
+
+```bash
 curl -fsSL https://get.docker.com | sh
 sudo usermod -aG docker $USER
 # Cierra sesión y vuelve a entrar para aplicar el grupo
