@@ -1,30 +1,6 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-
-interface Servicio {
-  id: number;
-  nombre: string;
-  descripcion: string;
-  precio: number;
-}
-
-let services: Servicio[] = [];
-let fetchError = false;
-try {
-  // ASTRO_BUILD_BACKEND_URL se pasa como ARG en el Dockerfile y apunta al backend
-  // dentro de la red Docker (http://backend:8080/api). Solo disponible en build time.
-  const buildApiUrl = process.env.ASTRO_BUILD_BACKEND_URL ?? "http://localhost:8080/api";
-  const res = await fetch(`${buildApiUrl}/services`);
-  if (res.ok) {
-    const body = await res.json();
-    services = body.data ?? [];
-  } else {
-    fetchError = true;
-  }
-} catch {
-  fetchError = true;
-}
-
+import ServiciosLanding from "../components/landing/ServiciosLanding";
 ---
 
 <BaseLayout
@@ -165,49 +141,7 @@ try {
         </p>
       </div>
 
-      {fetchError || services.length === 0 ? (
-        <p class="mt-12 font-sans text-base text-sgl-gray-mid">
-          Los servicios no están disponibles en este momento.
-        </p>
-      ) : (
-        <div class="mt-12 grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 items-start">
-          {services.map((svc, i) => (
-            <details
-              class="svc-card group bg-sgl-gray rounded-xl border border-sgl-gray-light/10
-                hover:border-sgl-gold/40 transition-colors duration-200"
-              data-animate
-              style={`transition-delay: ${i * 60}ms`}
-            >
-              <summary class="flex items-center justify-between gap-3 px-6 py-5 cursor-pointer select-none">
-                <div class="flex-1 min-w-0">
-                  <h3 class="font-serif text-lg font-semibold text-sgl-white leading-snug">{svc.nombre}</h3>
-                </div>
-                <svg
-                  class="svc-chevron shrink-0 w-5 h-5 text-sgl-gray-mid"
-                  viewBox="0 0 20 20" fill="none"
-                  aria-hidden="true"
-                >
-                  <path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </summary>
-
-              <div class="svc-body">
-                <div>
-                  <div class="px-6 pb-6 pt-1 flex flex-col gap-4 border-t border-sgl-gold/10">
-                    <p class="font-sans text-sm text-sgl-gray-mid leading-relaxed">{svc.descripcion}</p>
-                    <a
-                      href="/agendar"
-                      class="self-start bg-sgl-gold hover:bg-sgl-gold-light text-sgl-black font-semibold px-6 py-3 rounded transition-colors duration-200 text-sm"
-                    >
-                      Agendar consulta
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </details>
-          ))}
-        </div>
-      )}
+      <ServiciosLanding client:load />
     </div>
   </section>
 

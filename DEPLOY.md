@@ -70,29 +70,11 @@ Variables mínimas para que el sistema arranque:
 
 ## Parte 3 — Primer despliegue
 
-### Opción A — Despliegue rápido (recomendado para demo)
-
 ```bash
 docker compose -f docker-compose.prod.yml up -d --build
 ```
 
-> La página de inicio (`/`) mostrará "servicios no disponibles" hasta el paso B, porque el build del frontend ocurre antes de que el backend esté corriendo. El **flujo de agendamiento funciona correctamente** desde el primer momento.
-
-### Opción B — Despliegue completo con SSG de servicios
-
-Para que la landing page pre-renderice los servicios en el HTML inicial:
-
-```bash
-# 1. Levanta base de datos y backend
-docker compose -f docker-compose.prod.yml up -d --build postgres backend
-
-# 2. Espera a que el backend esté listo (~30 s)
-until curl -sf http://localhost:8080/api/health; do sleep 5; done
-echo "Backend listo"
-
-# 3. Construye y levanta el resto (frontend puede llegar al backend durante el build)
-docker compose -f docker-compose.prod.yml up -d --build frontend caddy sgl_backup
-```
+Los servicios de la landing page se cargan en el browser al visitar el sitio (client-side). No hay dependencia del backend durante el build.
 
 ---
 

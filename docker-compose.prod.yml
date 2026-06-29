@@ -4,11 +4,6 @@ name: sgl-prod
 # 1. Copia .env.example → .env y rellena todas las variables.
 # 2. Coloca los certificados Cloudflare Origin en ./certs/origin.pem y ./certs/origin.key
 # 3. docker compose -f docker-compose.prod.yml up -d --build
-#
-# Para que la página de inicio pre-renderice los servicios (SSG):
-#   a. Levanta backend primero: docker compose -f docker-compose.prod.yml up -d postgres backend
-#   b. Espera ~30 s y verifica: curl http://localhost:8080/api/health
-#   c. Reconstruye el frontend: docker compose -f docker-compose.prod.yml up -d --build frontend
 # ─────────────────────────────────────────────────────────────────────────────
 
 services:
@@ -58,13 +53,8 @@ services:
     build:
       context: ./sgl_front
       dockerfile: Dockerfile
-      # Usa la red interna del compose para que el SSG de index.astro
-      # pueda llegar al backend por su nombre de servicio.
-      # Requiere que postgres+backend estén corriendo antes del build.
-      network: sgl-prod_sgl_network
       args:
         PUBLIC_API_URL: /api
-        ASTRO_BUILD_BACKEND_URL: http://backend:8080/api
         PUBLIC_TURNSTILE_SITE_KEY: ${PUBLIC_TURNSTILE_SITE_KEY:-}
     container_name: sgl_front_prod
     restart: unless-stopped
