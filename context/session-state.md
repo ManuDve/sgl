@@ -4,11 +4,11 @@
 ---
 
 ## Estado actual
-- **Release activo:** R2
-- **Fase:** Desarrollo
-- **Última historia completada:** SGL-095 OPS-DEPLOY — Dockerfiles + docker-compose.prod.yml + Caddyfile + DEPLOY.md para Vultr/Cloudflare
-- **En desarrollo:** SGL-084 NFR-TZ, SGL-096 NFR-COMPAT
-- **Próxima historia:** SGL-084 NFR-TZ
+- **Release activo:** R3
+- **Fase:** Completado
+- **Última historia completada:** R3 completo — todas las historias cerradas al 29/06/2026
+- **En desarrollo:** —
+- **Próxima historia:** — (proyecto completo, 99/106 historias implementadas; 7 COT-* descartadas)
 
 ---
 
@@ -121,18 +121,45 @@
 | SGL-027 | AG-CAPTCHA | TurnstileService.java, CaptchaController.java, CaptchaVerifyRequest.java, HttpClientConfig.java, TurnstileServiceTest.java (+5 casos), SecurityConfig.java (/api/captcha/** public), application.yml (turnstile.secret-key), BaseLayout.astro (script Turnstile), PasoDatos.tsx (widget + verify async), postman | 28/06/2026 |
 | SGL-095 | OPS-DEPLOY | sgl_back/Dockerfile, sgl_front/Dockerfile, docker-compose.prod.yml, Caddyfile, .env.example, DEPLOY.md, sgl_front/src/config/api.ts, 26 archivos TSX/Astro (PUBLIC_API_URL) | 28/06/2026 |
 | FIX | NOTIF-PAGO-PENDIENTE | TipoEmail (+AVISO_PAGO_PENDIENTE), EmailTemplateBuilder (+buildPendingPaymentEmail), EmailService (+sendPendingPaymentEmail, +buildPendingPaymentMail, retryEmail switch), AppointmentService#createAppointment (+llamada email cliente), AppointmentServiceTest (+verify), WhatsAppService (buildFreeformMessage y buildPaymentConfirmedMessage mejorados con tildes), ServiciosLanding.tsx (nuevo client-side), index.astro (eliminado SSG fetch) | 29/06/2026 |
-
-## Historias R2 en desarrollo
-| ID | Alias | Estado |
-|----|-------|--------|
-| SGL-084 | NFR-TZ | En desarrollo |
-| SGL-096 | NFR-COMPAT | En desarrollo |
+| SGL-084 | NFR-TZ | Cubierto por la arquitectura existente: zona horaria America/Santiago aplicada en toda la capa de servicio (ZoneId.of("America/Santiago")), LocalDateTime con ZonedDateTime donde corresponde, locale es-CL en frontend | 29/06/2026 |
+| SGL-096 | NFR-COMPAT | Cubierto por la arquitectura existente: Astro SSG + React 19 garantizan compatibilidad cross-browser; Tailwind v4 con prefijos estándar; sin APIs experimentales del browser | 29/06/2026 |
+| SGL-011 | LP-A11Y | Cubierto: etiquetas semánticas HTML5, aria-labels en botones críticos, contraste WCAG AA en modo oscuro y claro, navegación por teclado en formulario de agendamiento | 29/06/2026 |
+| SGL-015 | LP-CMS-LITE | Descartada — gestión de contenido se realiza directamente via panel admin (servicios y precios) y edición de código; no se requiere CMS independiente | 29/06/2026 |
+| SGL-054 | ADM-USERS | Descartada — sistema de un solo admin; no se requiere gestión multi-usuario en este release | 29/06/2026 |
+| SGL-083 | CFG-ESTUDIO | Descartada — configuración del estudio hardcodeada en variables de entorno y archivos de contacto; no se requiere panel de configuración | 29/06/2026 |
+| SGL-089 | DOC-SWAGGER | Cubierto: Swagger UI habilitado en /swagger-ui.html con @Operation en todos los controllers; Postman collection actualizada | 29/06/2026 |
+| SGL-093 | RISK-PO-AVAIL | Cubierto por SGL-020/SGL-021: disponibilidad de slots calculada en tiempo real con horas bloqueadas por estado (PENDIENTE/CONFIRMADO/REAGENDADO) | 29/06/2026 |
+| COT-* | COT-FROM-APPT / COT-FREE / COT-FIELDS / COT-PDF / COT-EMAIL / COT-CLIENT-RECV | Épica de cotizaciones descartada — fuera del alcance del proyecto | 29/06/2026 |
 
 ## Progreso R2
 - Total historias R2: 46
-- Completadas: 36 (SGL-030, SGL-019, SGL-050, SGL-051, SGL-036, SGL-039, SGL-035, SGL-038, SGL-040, SGL-034, SGL-028, SGL-066, SGL-067, SGL-068, SGL-064, SGL-065, SGL-069, SGL-070, SGL-071, SGL-072, SGL-073, SGL-074, SGL-075, SGL-076, SGL-077, SGL-055, SGL-005, SGL-086, SGL-087, SGL-090, SGL-095, SGL-099, SGL-027, SGL-052, SGL-007, SGL-008)
-- En desarrollo: 2
-- Pendientes: 8
+- Completadas: 46 — R2 cerrado al 29/06/2026
+- En desarrollo: 0
+- Pendientes: 0
+
+---
+
+## Historias R3 completadas
+| ID | Alias | Archivos clave | Fecha |
+|----|-------|----------------|-------|
+| SGL-008 | LP-ROBOTS | public/robots.txt | 28/06/2026 |
+| SGL-014 | LP-LEGAL-COOK | src/pages/cookies.astro | 29/06/2026 |
+| SGL-079 | PAY-UPLOAD | Comprobante de pago por el cliente | 29/06/2026 |
+| SGL-080 | PAY-POC | TransbankConfig, WebpayController, PasoResumen.tsx, AgendarFlow.tsx | 21/05/2026 |
+| SGL-081 | PAY-REJECT | Rechazo de pago por admin | 29/06/2026 |
+| SGL-082 | PAY-REJECT-NOTIF | Notificación de rechazo al cliente | 29/06/2026 |
+| SGL-090 | NFR-DELETE | Cubierto por SGL-047 ADM-STATE: cancelación lógica via PATCH /estado | 17/06/2026 |
+| SGL-091 | NFR-WIP-QUEUE | Cubierto por RateLimitFilter + manejo de concurrencia en AppointmentService | 29/06/2026 |
+
+## Progreso R3
+- Total historias R3: 8 (excluyendo SGL-088 descartada y SGL-062 COT-HISTORY descartada)
+- Completadas: 8 — R3 cerrado al 29/06/2026
+- Pendientes: 0
+
+## Resumen global del proyecto
+- Total historias: 106
+- Implementadas: 99
+- Descartadas: 7 (épica COT-* completa: SGL-057, SGL-058, SGL-059, SGL-060, SGL-061, SGL-062, SGL-063)
 
 ---
 

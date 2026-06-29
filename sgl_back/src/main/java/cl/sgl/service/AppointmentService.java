@@ -350,7 +350,9 @@ public class AppointmentService {
         emailService.sendPendingPaymentEmail(saved);
         // Notificación al admin para que esté al tanto del nuevo agendamiento.
         emailService.sendAdminNewAppointmentEmail(saved); // SGL-036
-        whatsAppService.sendConfirmationWhatsApp(saved);  // SGL-034 — fallo no bloquea el flujo
+        try { whatsAppService.sendConfirmationWhatsApp(saved); } catch (Exception e) {
+            log.warn("WhatsApp omitido para {} — {}", saved.getIdExterno(), e.getMessage());
+        }
 
         return mapToDetail(saved);
     }
@@ -386,7 +388,9 @@ public class AppointmentService {
         Appointment saved = appointmentRepository.save(appointment);
         log.info("Pago Webpay confirmado — idExterno: {}, auth: {}", idExterno, authorizationCode);
         emailService.sendConfirmationEmail(saved);
-        whatsAppService.sendPaymentConfirmedWhatsApp(saved); // SGL-028
+        try { whatsAppService.sendPaymentConfirmedWhatsApp(saved); } catch (Exception e) {
+            log.warn("WhatsApp omitido para {} — {}", idExterno, e.getMessage());
+        }
     }
 
     /**
@@ -425,7 +429,9 @@ public class AppointmentService {
         log.info("Pago confirmado — ID={} | codigo={} | monto={}",
             id, request.getCodigoTransaccion(), appointment.getMonto());
         emailService.sendConfirmationEmail(saved);
-        whatsAppService.sendPaymentConfirmedWhatsApp(saved); // SGL-028
+        try { whatsAppService.sendPaymentConfirmedWhatsApp(saved); } catch (Exception e) {
+            log.warn("WhatsApp omitido para {} — {}", saved.getIdExterno(), e.getMessage());
+        }
         auditService.log(ACCION_CONFIRMAR_PAGO, ENTIDAD_AGENDAMIENTO, saved.getIdExterno(),
             "codigo=" + request.getCodigoTransaccion() + " monto=" + saved.getMonto());
 
