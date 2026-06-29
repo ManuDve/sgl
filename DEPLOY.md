@@ -33,12 +33,12 @@ sudo usermod -aG docker $USER
 4. En el servidor:
 
 ```bash
-mkdir -p /ruta/al/repo/certs
+mkdir -p /opt/sgl/certs
 # Pega el contenido del certificado
-nano /ruta/al/repo/certs/origin.pem
+nano /opt/sgl/certs/origin.pem
 # Pega el contenido de la clave privada
-nano /ruta/al/repo/certs/origin.key
-chmod 600 certs/origin.key
+nano /opt/sgl/certs/origin.key
+chmod 600 /opt/sgl/certs/origin.key
 ```
 
 5. En Cloudflare → **SSL/TLS → Overview** → modo **Full** (no Full Strict, porque el Origin Certificate no es de una CA pública)

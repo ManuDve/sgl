@@ -9,6 +9,9 @@ export default defineConfig({
   site: 'https://www.alexcontreras.cl',
   vite: {
     plugins: [tailwindcss()],
+    preview: {
+      allowedHosts: ['alexcontreras.cl', 'www.alexcontreras.cl'],
+    },
     optimizeDeps: {
       include: ['react', 'react-dom', 'react/jsx-runtime', 'react/jsx-dev-runtime'],
       esbuildOptions: {
