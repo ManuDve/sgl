@@ -29,6 +29,9 @@ public class AdminUserInitializer implements CommandLineRunner {
     private final PasswordEncoder     passwordEncoder;
     private final Environment         environment;
 
+    @Value("${ADMIN_EMAIL:#{null}}")
+    private String adminEmail;
+
     @Value("${ADMIN_PASSWORD:#{null}}")
     private String adminPassword;
 
@@ -42,20 +45,22 @@ public class AdminUserInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        if (adminUserRepository.existsByEmail(DEFAULT_EMAIL)) {
+        String email = (adminEmail != null && !adminEmail.isBlank()) ? adminEmail : DEFAULT_EMAIL;
+
+        if (adminUserRepository.existsByEmail(email)) {
             return;
         }
 
         String password = resolvePassword();
 
         AdminUser adminUser = AdminUser.builder()
-            .email(DEFAULT_EMAIL)
+            .email(email)
             .password(passwordEncoder.encode(password))
             .role("ADMIN")
             .build();
 
         adminUserRepository.save(adminUser);
-        log.info("[AdminUserInitializer] Admin creado: {}", DEFAULT_EMAIL);
+        log.info("[AdminUserInitializer] Admin creado: {}", email);
     }
 
     private String resolvePassword() {
