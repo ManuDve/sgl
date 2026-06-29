@@ -11,12 +11,9 @@ interface Servicio {
 let services: Servicio[] = [];
 let fetchError = false;
 try {
-  // En build de Docker con PUBLIC_API_URL=/api (relativo), usa localhost como fallback
-  // para el fetch SSG del servidor. Con `network: host` en el build de Docker Compose
-  // y el backend corriendo, el fetch llega al backend real.
-  const buildApiUrl = (import.meta.env.PUBLIC_API_URL as string | undefined)?.startsWith("http")
-    ? import.meta.env.PUBLIC_API_URL
-    : "http://localhost:8080/api";
+  // ASTRO_BUILD_BACKEND_URL se pasa como ARG en el Dockerfile y apunta al backend
+  // dentro de la red Docker (http://backend:8080/api). Solo disponible en build time.
+  const buildApiUrl = process.env.ASTRO_BUILD_BACKEND_URL ?? "http://localhost:8080/api";
   const res = await fetch(`${buildApiUrl}/services`);
   if (res.ok) {
     const body = await res.json();

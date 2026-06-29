@@ -9,8 +9,11 @@ RUN npm ci
 # El valor por defecto /api funciona cuando Caddy hace proxy de /api/* al backend.
 ARG PUBLIC_API_URL=/api
 ARG PUBLIC_TURNSTILE_SITE_KEY
+# Solo para el fetch SSG de index.astro — no se expone al browser
+ARG ASTRO_BUILD_BACKEND_URL=http://localhost:8080/api
 ENV PUBLIC_API_URL=$PUBLIC_API_URL
 ENV PUBLIC_TURNSTILE_SITE_KEY=$PUBLIC_TURNSTILE_SITE_KEY
+ENV ASTRO_BUILD_BACKEND_URL=$ASTRO_BUILD_BACKEND_URL
 
 COPY . .
 RUN npm run build

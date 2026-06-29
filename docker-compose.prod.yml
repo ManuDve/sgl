@@ -58,11 +58,13 @@ services:
     build:
       context: ./sgl_front
       dockerfile: Dockerfile
-      # Host network durante el build permite que el SSG de index.astro
-      # llegue al backend en http://localhost:8080 si ya está levantado.
-      network: host
+      # Usa la red interna del compose para que el SSG de index.astro
+      # pueda llegar al backend por su nombre de servicio.
+      # Requiere que postgres+backend estén corriendo antes del build.
+      network: sgl-prod_sgl_network
       args:
         PUBLIC_API_URL: /api
+        ASTRO_BUILD_BACKEND_URL: http://backend:8080/api
         PUBLIC_TURNSTILE_SITE_KEY: ${PUBLIC_TURNSTILE_SITE_KEY:-}
     container_name: sgl_front_prod
     restart: unless-stopped
