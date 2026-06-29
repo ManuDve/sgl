@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { API_BASE } from '../config/api';
 
 interface Appointment {
   idExterno: string;
@@ -63,7 +64,7 @@ export default function ConfirmacionView() {
       return;
     }
 
-    fetch(`http://localhost:8080/api/appointments/${id}`)
+    fetch(`${API_BASE}/appointments/${id}`)
       .then(r => { if (!r.ok) throw new Error(); return r.json(); })
       .then(b => { setApt(b.data); })
       .catch(() => setError("No se pudo cargar la confirmación. Guarda tu ID de cita."))
@@ -87,7 +88,7 @@ export default function ConfirmacionView() {
     setErrorPago("");
     try {
       const res = await fetch(
-        `http://localhost:8080/api/webpay/init?idExterno=${id}`,
+        `${API_BASE}/webpay/init?idExterno=${id}`,
         { method: "POST" }
       );
       const body = await res.json();

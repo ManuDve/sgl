@@ -22,7 +22,7 @@ export default function CancelAppointmentModal({
     setError("");
     try {
       const res = await fetch(
-        `http://localhost:8080/api/admin/appointments/${appointmentId}/estado`,
+        `${import.meta.env.PUBLIC_API_URL ?? 'http://localhost:8080/api'}/admin/appointments/${appointmentId}/estado`,
         {
           method: "PATCH",
           headers: {

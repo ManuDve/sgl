@@ -69,7 +69,7 @@ export default function ServiciosAdmin() {
     setLoading(true);
     setError("");
 
-    fetch("http://localhost:8080/api/admin/services", {
+    fetch(`${import.meta.env.PUBLIC_API_URL ?? 'http://localhost:8080/api'}/admin/services`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => {

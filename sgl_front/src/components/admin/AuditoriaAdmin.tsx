@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { API_BASE } from '../../config/api';
 
 // ── Tipos ─────────────────────────────────────────────────────────────────────
 
@@ -39,7 +40,7 @@ const ACCION_LABEL: Record<string, string> = {
 const PAGE_SIZES = [10, 20, 50] as const;
 type PageSize = (typeof PAGE_SIZES)[number];
 
-const API = "http://localhost:8080/api/admin/audit";
+const API = `${API_BASE}/admin/audit`;
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 

@@ -6,7 +6,7 @@
 ## Estado actual
 - **Release activo:** R2
 - **Fase:** Desarrollo
-- **Última historia completada:** SGL-027 AG-CAPTCHA — Cloudflare Turnstile anti-bot en flujo de agendamiento
+- **Última historia completada:** SGL-095 OPS-DEPLOY — Dockerfiles + docker-compose.prod.yml + Caddyfile + DEPLOY.md para Vultr/Cloudflare
 - **En desarrollo:** SGL-084 NFR-TZ, SGL-096 NFR-COMPAT
 - **Próxima historia:** SGL-084 NFR-TZ
 
@@ -119,6 +119,7 @@
 | UI | LP-LIGHT-MODE | global.css (html[data-theme="light"] palette WCAG AA), BaseLayout.astro (forceDark prop + inline no-flash script), NavbarPublica.astro (toggle sol/luna + script localStorage), AdminLayout.astro (forceDark=true) | 28/06/2026 |
 | UI | LP-CONTACT-INFO | index.astro (email contacto@alexcontreras.cl, Av. Providencia 133, wa.me/14155238886), LoginForm.tsx (placeholder admin@alexcontreras.cl) | 28/06/2026 |
 | SGL-027 | AG-CAPTCHA | TurnstileService.java, CaptchaController.java, CaptchaVerifyRequest.java, HttpClientConfig.java, TurnstileServiceTest.java (+5 casos), SecurityConfig.java (/api/captcha/** public), application.yml (turnstile.secret-key), BaseLayout.astro (script Turnstile), PasoDatos.tsx (widget + verify async), postman | 28/06/2026 |
+| SGL-095 | OPS-DEPLOY | sgl_back/Dockerfile, sgl_front/Dockerfile, docker-compose.prod.yml, Caddyfile, .env.example, DEPLOY.md, sgl_front/src/config/api.ts, 26 archivos TSX/Astro (PUBLIC_API_URL) | 28/06/2026 |
 
 ## Historias R2 en desarrollo
 | ID | Alias | Estado |
@@ -128,9 +129,9 @@
 
 ## Progreso R2
 - Total historias R2: 46
-- Completadas: 35 (SGL-030, SGL-019, SGL-050, SGL-051, SGL-036, SGL-039, SGL-035, SGL-038, SGL-040, SGL-034, SGL-028, SGL-066, SGL-067, SGL-068, SGL-064, SGL-065, SGL-069, SGL-070, SGL-071, SGL-072, SGL-073, SGL-074, SGL-075, SGL-076, SGL-077, SGL-055, SGL-005, SGL-086, SGL-087, SGL-090, SGL-095, SGL-099)
+- Completadas: 36 (SGL-030, SGL-019, SGL-050, SGL-051, SGL-036, SGL-039, SGL-035, SGL-038, SGL-040, SGL-034, SGL-028, SGL-066, SGL-067, SGL-068, SGL-064, SGL-065, SGL-069, SGL-070, SGL-071, SGL-072, SGL-073, SGL-074, SGL-075, SGL-076, SGL-077, SGL-055, SGL-005, SGL-086, SGL-087, SGL-090, SGL-095, SGL-099, SGL-027, SGL-052, SGL-007, SGL-008)
 - En desarrollo: 2
-- Pendientes: 9
+- Pendientes: 8
 
 ---
 
@@ -149,6 +150,9 @@
 | DataSeeder controlado por `SGL_SEED_DEMO=true` | Gate por env var en lugar de perfil; permite sembrar en staging sin cambiar perfil y garantiza que prod no siembre por defecto |
 | `ADMIN_PASSWORD` desde env var | Contraseña del admin no hardcodeada en producción; fallback `admin123` solo en perfil `dev` con log INFO; log ERROR si falta en prod |
 | AG-CAPTCHA movida a Bloqueo/R3 | Sin Google reCAPTCHA keys disponibles |
+| `PUBLIC_API_URL=/api` (relativo) en prod | El build del frontend usa `/api` como base; el browser resuelve contra el mismo origen (`alexcontreras.cl/api/*`) y Caddy hace proxy al backend. Sin CORS ni exposición de puertos del backend |
+| Cloudflare Turnstile + Cloudflare Origin Certificate | Combo Cloudflare Full SSL: Origin Cert → Caddy maneja TLS; Turnstile para anti-bot sin costo |
+| `network: host` en build del frontend | Permite que el SSG de `index.astro` llegue al backend (`http://localhost:8080`) durante `docker compose build` si el backend ya está corriendo; si no, usa el fallback gracioso |
 
 ---
 
@@ -210,9 +214,6 @@ Para pantallas nuevas (no multipaso): usar `[data-animate]` + `IntersectionObser
 | `cl.sgl.config.AdminUserInitializer` | Admin `admin@sgl.cl`. Contraseña desde `ADMIN_PASSWORD`; fallback `admin123` solo en perfil `dev` | Todos excepto perfil `test` |
 
 ---
-
-## Pendiente sin historia asignada
-- Dockerfiles para `sgl_front` y `sgl_back` — necesarios para levantar el monorepo completo con `docker compose up` (relacionado con SGL-095 OPS-DEPLOY)
 
 ## Deuda técnica pendiente
 - SGL-044 ADM-DASH: KPIs client-side; endpoint dedicado `/api/admin/dashboard/kpis` pendiente

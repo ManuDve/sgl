@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import ConfirmPaymentModal from "./ConfirmPaymentModal";
 import RescheduleModal from "./RescheduleModal";
 import CancelAppointmentModal from "./CancelAppointmentModal";
+import { API_BASE } from '../../config/api';
 
 interface NotificationLogEntry {
   id:           number;
@@ -147,7 +148,7 @@ export default function AppointmentDetail({ id, onClose, onStatusChanged }: Prop
     setNotifError("");
     try {
       const res = await fetch(
-        `http://localhost:8080/api/admin/notifications/log?appointmentId=${id}`,
+        `${API_BASE}/admin/notifications/log?appointmentId=${id}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       if (res.status === 401) { localStorage.removeItem("sgl_token"); window.location.href = "/admin/login"; return; }
@@ -176,7 +177,7 @@ export default function AppointmentDetail({ id, onClose, onStatusChanged }: Prop
     setError("");
     setDetail(null);
 
-    fetch(`http://localhost:8080/api/admin/appointments/${id}`, {
+    fetch(`${API_BASE}/admin/appointments/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => {

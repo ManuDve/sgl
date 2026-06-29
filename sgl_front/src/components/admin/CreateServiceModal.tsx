@@ -61,7 +61,7 @@ export default function CreateServiceModal({ onSuccess, onClose }: Props) {
     setError("");
 
     try {
-      const res = await fetch("http://localhost:8080/api/admin/services", {
+      const res = await fetch(`${import.meta.env.PUBLIC_API_URL ?? 'http://localhost:8080/api'}/admin/services`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
         body: JSON.stringify({

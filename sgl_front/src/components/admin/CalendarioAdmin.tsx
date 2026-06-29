@@ -242,7 +242,7 @@ export default function CalendarioAdmin() {
     setError("");
 
     fetch(
-      `http://localhost:8080/api/admin/appointments/calendario?mes=${mes}&semana=${semana}`,
+      `${import.meta.env.PUBLIC_API_URL ?? 'http://localhost:8080/api'}/admin/appointments/calendario?mes=${mes}&semana=${semana}`,
       { headers: { Authorization: `Bearer ${token}` } }
     )
       .then((res) => {

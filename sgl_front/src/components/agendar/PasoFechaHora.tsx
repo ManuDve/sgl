@@ -126,7 +126,7 @@ export default function PasoFechaHora({ servicio, inicial, onContinuar, onAtras 
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     const fromStr = tomorrow.toLocaleDateString("en-CA", { timeZone: "America/Santiago" });
-    fetch(`http://localhost:8080/api/appointments/days-available?from=${fromStr}&days=90`)
+    fetch(`${import.meta.env.PUBLIC_API_URL ?? 'http://localhost:8080/api'}/appointments/days-available?from=${fromStr}&days=90`)
       .then(r => { if (!r.ok) throw new Error(); return r.json(); })
       .then(b => setAvailableDays(new Set<string>(b.data ?? [])))
       .catch(() => setErrorDays("No se pudieron cargar las fechas disponibles."))
@@ -140,7 +140,7 @@ export default function PasoFechaHora({ servicio, inicial, onContinuar, onAtras 
     setAvailableHours([]);
     setLoadingHours(true);
     setErrorHours("");
-    fetch(`http://localhost:8080/api/appointments/hours-available?date=${selectedDate}`)
+    fetch(`${import.meta.env.PUBLIC_API_URL ?? 'http://localhost:8080/api'}/appointments/hours-available?date=${selectedDate}`)
       .then(r => { if (!r.ok) throw new Error(); return r.json(); })
       .then(b => setAvailableHours(b.data ?? []))
       .catch(() => setErrorHours("No se pudieron cargar las horas disponibles."))

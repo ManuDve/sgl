@@ -1,0 +1,39 @@
+{
+	# Desactivar auto-HTTPS: se usa Cloudflare Origin Certificate manualmente.
+	# Cloudflare actúa como proxy TLS entre el usuario y este servidor (modo Full).
+	auto_https off
+}
+
+# ─── Redirect HTTP → HTTPS ────────────────────────────────────────────────────
+:80 {
+	redir https://{host}{uri} 301
+}
+
+# ─── www → apex ───────────────────────────────────────────────────────────────
+www.alexcontreras.cl:443 {
+	tls /etc/caddy/certs/origin.pem /etc/caddy/certs/origin.key
+	redir https://alexcontreras.cl{uri} 301
+}
+
+# ─── Sitio principal ──────────────────────────────────────────────────────────
+alexcontreras.cl:443 {
+	tls /etc/caddy/certs/origin.pem /etc/caddy/certs/origin.key
+
+	# API → backend
+	handle /api/* {
+		reverse_proxy backend:8080 {
+			# CF-Connecting-IP contiene la IP real del usuario (enviada por Cloudflare).
+			# Se pasa como X-Forwarded-For para que RateLimitFilter use la IP correcta.
+			header_up X-Forwarded-For {header.CF-Connecting-IP}
+			header_up X-Real-IP       {header.CF-Connecting-IP}
+			header_up Host            {host}
+		}
+	}
+
+	# Todo lo demás → frontend (Astro preview / static)
+	handle {
+		reverse_proxy frontend:4321 {
+			header_up Host {host}
+		}
+	}
+}

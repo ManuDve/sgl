@@ -45,7 +45,7 @@ export default function DeleteServiceModal({ service, onSuccess, onClose }: Prop
     setError("");
 
     try {
-      const res = await fetch(`http://localhost:8080/api/admin/services/${service.id}`, {
+      const res = await fetch(`${import.meta.env.PUBLIC_API_URL ?? 'http://localhost:8080/api'}/admin/services/${service.id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });

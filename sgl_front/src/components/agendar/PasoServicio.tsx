@@ -82,7 +82,7 @@ export default function PasoServicio({ onContinuar }: Props) {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/services")
+    fetch(`${import.meta.env.PUBLIC_API_URL ?? 'http://localhost:8080/api'}/services`)
       .then((res) => {
         if (!res.ok) throw new Error();
         return res.json();

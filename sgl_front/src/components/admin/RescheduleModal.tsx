@@ -28,7 +28,7 @@ export default function RescheduleModal({
     setError("");
     try {
       const res = await fetch(
-        `http://localhost:8080/api/admin/appointments/${appointmentId}/reagendar`,
+        `${import.meta.env.PUBLIC_API_URL ?? 'http://localhost:8080/api'}/admin/appointments/${appointmentId}/reagendar`,
         {
           method: "PATCH",
           headers: {

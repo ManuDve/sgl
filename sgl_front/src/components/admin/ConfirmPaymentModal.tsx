@@ -54,7 +54,7 @@ export default function ConfirmPaymentModal({
 
     try {
       const res = await fetch(
-        `http://localhost:8080/api/admin/appointments/${appointmentId}/pago`,
+        `${import.meta.env.PUBLIC_API_URL ?? 'http://localhost:8080/api'}/admin/appointments/${appointmentId}/pago`,
         {
           method: "PATCH",
           headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },

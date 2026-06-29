@@ -42,7 +42,10 @@
       "Bash(pip3 install *)",
       "Bash(brew install *)",
       "Bash(npm install *)",
-      "Bash(npm ls *)"
+      "Bash(npm ls *)",
+      "Bash(npx astro *)",
+      "Bash(node_modules/.bin/tsc --version)",
+      "Bash(grep -E \"^typescript$\")"
     ]
   }
 }

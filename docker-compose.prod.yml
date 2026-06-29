@@ -1,0 +1,122 @@
+name: sgl-prod
+
+# ─── Uso ─────────────────────────────────────────────────────────────────────
+# 1. Copia .env.example → .env y rellena todas las variables.
+# 2. Coloca los certificados Cloudflare Origin en ./certs/origin.pem y ./certs/origin.key
+# 3. docker compose -f docker-compose.prod.yml up -d --build
+#
+# Para que la página de inicio pre-renderice los servicios (SSG):
+#   a. Levanta backend primero: docker compose -f docker-compose.prod.yml up -d postgres backend
+#   b. Espera ~30 s y verifica: curl http://localhost:8080/api/health
+#   c. Reconstruye el frontend: docker compose -f docker-compose.prod.yml up -d --build frontend
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: sgl_postgres_prod
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB:       ${POSTGRES_DB:-sgl_db}
+      POSTGRES_USER:     ${POSTGRES_USER:-sgl_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - sgl_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-sgl_user} -d ${POSTGRES_DB:-sgl_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./sgl_back
+      dockerfile: Dockerfile
+    container_name: sgl_back_prod
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      # Estas sobrescriben lo que venga en env_file para garantizar coherencia
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL:      jdbc:postgresql://postgres:5432/${POSTGRES_DB:-sgl_db}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-sgl_user}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+    # Solo accesible desde localhost del host (para build del frontend con SSG).
+    # No queda expuesto públicamente: Caddy actúa de proxy interno.
+    ports:
+      - "127.0.0.1:8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - sgl_network
+
+  frontend:
+    build:
+      context: ./sgl_front
+      dockerfile: Dockerfile
+      # Host network durante el build permite que el SSG de index.astro
+      # llegue al backend en http://localhost:8080 si ya está levantado.
+      network: host
+      args:
+        PUBLIC_API_URL: /api
+        PUBLIC_TURNSTILE_SITE_KEY: ${PUBLIC_TURNSTILE_SITE_KEY:-}
+    container_name: sgl_front_prod
+    restart: unless-stopped
+    depends_on:
+      - backend
+    networks:
+      - sgl_network
+
+  sgl_backup:
+    image: postgres:15-alpine
+    container_name: sgl_backup_prod
+    restart: unless-stopped
+    labels:
+      org.springframework.boot.ignore: "true"
+    environment:
+      POSTGRES_DB:       ${POSTGRES_DB:-sgl_db}
+      POSTGRES_USER:     ${POSTGRES_USER:-sgl_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      TZ: America/Santiago
+    volumes:
+      - ./backup.sh:/backup.sh:ro
+      - ./backups:/backups
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - sgl_network
+    command: >
+      sh -c "echo '0 2 * * * sh /backup.sh >> /var/log/backup.log 2>&1' | crontab - &&
+             crond -f -l 2"
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: sgl_caddy_prod
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./certs:/etc/caddy/certs:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - sgl_network
+
+volumes:
+  postgres_data:
+  caddy_data:
+  caddy_config:
+
+networks:
+  sgl_network:
+    driver: bridge

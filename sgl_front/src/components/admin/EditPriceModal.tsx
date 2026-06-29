@@ -60,7 +60,7 @@ export default function EditPriceModal({ service, onSuccess, onClose }: Props) {
   useEffect(() => {
     const token = localStorage.getItem("sgl_token");
     if (!token) return;
-    fetch(`http://localhost:8080/api/admin/services/${service.id}/historial-precios`, {
+    fetch(`${import.meta.env.PUBLIC_API_URL ?? 'http://localhost:8080/api'}/admin/services/${service.id}/historial-precios`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
@@ -99,7 +99,7 @@ export default function EditPriceModal({ service, onSuccess, onClose }: Props) {
 
     try {
       const res = await fetch(
-        `http://localhost:8080/api/admin/services/${service.id}/precio`,
+        `${import.meta.env.PUBLIC_API_URL ?? 'http://localhost:8080/api'}/admin/services/${service.id}/precio`,
         {
           method: "PATCH",
           headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },

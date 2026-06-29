@@ -60,7 +60,7 @@ export default function DashboardKPIs() {
     if (!token) { window.location.href = "/admin/login"; return; }
 
     setError(false);
-    fetch("http://localhost:8080/api/admin/appointments", {
+    fetch(`${import.meta.env.PUBLIC_API_URL ?? 'http://localhost:8080/api'}/admin/appointments`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => {

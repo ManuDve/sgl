@@ -255,7 +255,7 @@ export default function PasoDatos({ servicio, inicial, onContinuar, onAtras }: P
       setVerifying(true);
       setCaptchaError("");
       try {
-        const res  = await fetch("http://localhost:8080/api/captcha/verify", {
+        const res  = await fetch(`${import.meta.env.PUBLIC_API_URL ?? 'http://localhost:8080/api'}/captcha/verify`, {
           method:  "POST",
           headers: { "Content-Type": "application/json" },
           body:    JSON.stringify({ token }),

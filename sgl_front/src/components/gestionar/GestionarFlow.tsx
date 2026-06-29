@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import StepTransition from "../StepTransition";
 import PasoFechaHora, { type FechaHoraSeleccion } from "../agendar/PasoFechaHora";
+import { API_BASE } from '../../config/api';
 
-const API = "http://localhost:8080/api";
+const API = API_BASE;
 
 // ─── Types ───────────────────────────────────────────────────
 

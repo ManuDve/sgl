@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { API_BASE } from '../../config/api';
 import Stepper from "./Stepper";
 import StepTransition from "./StepTransition";
 import PasoServicio from "./PasoServicio";
@@ -37,7 +38,7 @@ export default function AgendarFlow() {
     setErrorEnvio("");
 
     try {
-      const res = await fetch("http://localhost:8080/api/appointments", {
+      const res = await fetch(`${API_BASE}/appointments`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -59,7 +60,7 @@ export default function AgendarFlow() {
 
         // Iniciar pago con Webpay automáticamente
         const tbkRes = await fetch(
-          `http://localhost:8080/api/webpay/init?idExterno=${idExterno}`,
+          `${API_BASE}/webpay/init?idExterno=${idExterno}`,
           { method: "POST" }
         );
         const tbkBody = await tbkRes.json();

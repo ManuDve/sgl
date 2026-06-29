@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
+import { API_BASE as _API_ROOT } from '../../config/api';
 import AppointmentDetail from "./AppointmentDetail";
 
 interface AppointmentSummary {
@@ -39,7 +40,7 @@ const ESTADO_LABEL: Record<string, string> = {
 
 const PAGE_SIZES: PageSize[] = [10, 20, 50];
 
-const API_BASE = "http://localhost:8080/api/admin/appointments";
+const API_BASE = `${_API_ROOT}/admin/appointments`;
 
 function formatFecha(fecha: string): string {
   const [y, m, d] = fecha.split("-");
